@@ -4,8 +4,8 @@ export const THEME = extendTheme(
   {
     colors: {
       blue: {
-        light: '#647AC7',
-        dark: '#364D9D',
+        400: '#647AC7',
+        800: '#364D9D',
       },
       gray: {
         700: '#F7F7F8',
@@ -17,7 +17,7 @@ export const THEME = extendTheme(
         100: '#1A181B'
       },
       red: {
-        light: '#EE7979'
+        400: '#EE7979'
       }
     },
     fonts: {
