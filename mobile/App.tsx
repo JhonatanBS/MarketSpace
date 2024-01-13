@@ -21,7 +21,7 @@ export default function App() {
         barStyle={"dark-content"}
         backgroundColor={"transparent"}
         />
-        { fontsLoaded ? <SignOut /> : <Loading />}
+        { fontsLoaded ? <SignIn /> : <Loading />}
         
     </NativeBaseProvider>
   );
