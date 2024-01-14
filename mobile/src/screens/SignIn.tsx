@@ -14,7 +14,7 @@ import { useForm , Controller } from "react-hook-form";
 import { Eye, EyeSlash } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
 
-type FormData = {
+type FormDataProps = {
   email: string;
   password: string;
 }
@@ -29,7 +29,7 @@ export function SignIn() {
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
-  const { control, handleSubmit, formState: { errors }} = useForm<FormData>({
+  const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
   });
 

@@ -2,16 +2,41 @@ import { Box, Button, Center, Heading, Pressable, ScrollView, Text, VStack } fro
 
 import LogoSVG from "@assets/logo.svg";
 
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { useForm , Controller } from "react-hook-form";
+
 import { InputForm } from "@components/InputForm";
 import { Eye, EyeSlash, PencilSimpleLine, User } from "phosphor-react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmed_password: string;
+}
+
+const signOutSchema = yup.object({
+  name: yup.string().required("Informe seu nome"),
+  email: yup.string().required("Informe seu e-mail").email("E-mail inválido"),
+  phone: yup.string().required("Informe seu telefone"),
+  password: yup.string().required("Informe sua senha").min(6, "Insira pelo menos 6 digitos"),
+  confirmed_password: yup.string().required("Confirme sua senha").oneOf([yup.ref("password")], "A confirmação da senha não confere."),
+});
+
 export function SignOut() {
   const [show, setShow] = useState(true);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
+    resolver: yupResolver(signOutSchema)
+  });
 
   function handleNewNavigationSignIn() {
     navigation.navigate("signIn");
@@ -75,68 +100,112 @@ export function SignOut() {
             </Box>
           </Pressable>
 
-          <InputForm 
-            placeholder="Nome"
-            mb="16px"
+          <Controller 
+            control={control}
+            name="name"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="Nome"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+          />
+            )}
           />
 
-          <InputForm 
-            placeholder="E-mail"
-            mb="16px"
+          <Controller 
+            control={control}
+            name="email"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.email?.message}
+          />
+            )}
+          />
+          
+          <Controller 
+            control={control}
+            name="phone"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="Telefone"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.phone?.message}
+          />
+            )}
           />
 
-          <InputForm 
-            placeholder="Telefone"
-            mb="16px"
-          />
-
-          <InputForm 
-            placeholder="Senha"
-            mb="16px"
-            type={ show ? "text" : "password"}
-            InputRightElement={
-              <Pressable onPress={() => setShow(!show)} mr={3}>
-                { show ? 
-                <Eye 
-                size={20} 
-                color="#5F5B62" 
-                />
-                :
-                <EyeSlash 
-                size={20} 
-                color="#5F5B62"
-                />
+          <Controller 
+            control={control}
+            name="password"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="Senha"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+                type={ show ? "text" : "password"}
+                InputRightElement={
+                  <Pressable onPress={() => setShow(!show)} mr={3}>
+                    { show ? 
+                    <Eye 
+                    size={20} 
+                    color="#5F5B62" 
+                    />
+                    :
+                    <EyeSlash 
+                    size={20} 
+                    color="#5F5B62"
+                    />
+                    }
+                  </Pressable>
                 }
-              </Pressable>
-            }
+              />
+            )}
           />
 
-          <InputForm 
-            placeholder="Confirmar senha"
-            type={ show ? "text" : "password"}
-            InputRightElement={
-              <Pressable onPress={() => setShow(!show)} mr={3}>
-                { show ? 
-                <Eye 
-                size={20} 
-                color="#5F5B62" 
-                />
-                :
-                <EyeSlash 
-                size={20} 
-                color="#5F5B62"
-                />
+          <Controller 
+            control={control}
+            name="confirmed_password"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="Corfimar senha"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.confirmed_password?.message}
+                type={ show ? "text" : "password"}
+                InputRightElement={
+                  <Pressable onPress={() => setShow(!show)} mr={3}>
+                    { show ? 
+                    <Eye 
+                    size={20} 
+                    color="#5F5B62" 
+                    />
+                    :
+                    <EyeSlash 
+                    size={20} 
+                    color="#5F5B62"
+                    />
+                    }
+                  </Pressable>
                 }
-              </Pressable>
-            }
+              />
+            )}
           />
 
           <Button
+            onPress={handleSubmit(() => {})}
             bg={"gray.100"}
             borderRadius="6px"
             w="full"
             h="42px"
-            mt="24px"
+            mt="8px"
             _pressed={{
               backgroundColor: "gray.300"
             }}
