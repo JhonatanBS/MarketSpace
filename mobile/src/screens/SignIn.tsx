@@ -5,9 +5,18 @@ import { InputForm } from "@components/InputForm";
 
 import { Eye, EyeSlash } from "phosphor-react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+
+import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
 export function SignIn() {
   const [show, setShow] = useState(false);
+
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  function handleNewNavigationSignOut() {
+    navigation.navigate("signOut");
+  }
 
   return(
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -101,6 +110,7 @@ export function SignIn() {
               backgroundColor: "gray.600",
 
             }}
+            onPress={handleNewNavigationSignOut}
           >
             Criar uma conta
           </Button>

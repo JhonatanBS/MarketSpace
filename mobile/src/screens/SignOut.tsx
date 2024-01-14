@@ -5,9 +5,18 @@ import LogoSVG from "@assets/logo.svg";
 import { InputForm } from "@components/InputForm";
 import { Eye, EyeSlash, PencilSimpleLine, User } from "phosphor-react-native";
 import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
 export function SignOut() {
   const [show, setShow] = useState(true);
+
+  const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  function handleNewNavigationSignIn() {
+    navigation.navigate("signIn");
+  }
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
       <VStack flex={1} bg={"gray.600"}>
@@ -158,6 +167,7 @@ export function SignOut() {
               backgroundColor: "gray.400",
 
             }}
+            onPress={handleNewNavigationSignIn}
           >
             Ir para o login
           </Button>

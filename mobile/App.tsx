@@ -11,6 +11,8 @@ import { Loading } from "@components/Loading";
 import { SignIn } from '@screens/SignIn';
 import { SignOut } from '@screens/SignOut';
 
+import { Routes } from '@routes/index';
+
 export default function App() {
   const [fontsLoaded] = useFonts({ Karla_400Regular, Karla_700Bold });
 
@@ -21,7 +23,7 @@ export default function App() {
         barStyle={"dark-content"}
         backgroundColor={"transparent"}
         />
-        { fontsLoaded ? <SignIn /> : <Loading />}
+        { fontsLoaded ? <Routes /> : <Loading />}
         
     </NativeBaseProvider>
   );
