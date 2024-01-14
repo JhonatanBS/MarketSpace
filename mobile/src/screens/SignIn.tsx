@@ -1,18 +1,37 @@
+import { useState } from "react";
 import { Button, Center, Heading, Pressable, ScrollView, Text, VStack, theme } from "native-base";
+
+import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
 import LogoSVG from "@assets/logo.svg";
 import { InputForm } from "@components/InputForm";
 
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { useForm , Controller } from "react-hook-form";
+
 import { Eye, EyeSlash } from "phosphor-react-native";
-import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
+type FormData = {
+  email: string;
+  password: string;
+}
+
+const signInSchema = yup.object({
+  email: yup.string().required("Informe o e-mail").email("E-mail inválido"),
+  password: yup.string().required("Informe a senha").min(6, "Insira pelo menos 6 digitos"),
+});
 
 export function SignIn() {
   const [show, setShow] = useState(false);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+
+  const { control, handleSubmit, formState: { errors }} = useForm<FormData>({
+    resolver: yupResolver(signInSchema)
+  });
 
   function handleNewNavigationSignOut() {
     navigation.navigate("signOut");
@@ -47,37 +66,58 @@ export function SignIn() {
           Acesse sua conta
           </Text>
 
-          <InputForm 
-            placeholder="E-mail"
-            mb="16px"
+          <Controller 
+            control={control}
+            name="email"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.email?.message}
+          />
+            )}
           />
 
-          <InputForm 
-            placeholder="Senha"
-            type={ show ? "text" : "password"}
-            InputRightElement={
-              <Pressable onPress={() => setShow(!show)} mr={3}>
-                { show ? 
-                <Eye 
-                size={20} 
-                color="#5F5B62" 
-                />
-                :
-                <EyeSlash 
-                size={20} 
-                color="#5F5B62"
-                />
+          <Controller 
+            control={control}
+            name="password"
+            render={({ field: { onChange, value}}) => (
+              <InputForm 
+                placeholder="Senha"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+                type={ show ? "text" : "password"}
+                InputRightElement={
+                  <Pressable onPress={() => setShow(!show)} mr={3}>
+                    { show ? 
+                    <Eye 
+                    size={20} 
+                    color="#5F5B62" 
+                    />
+                    :
+                    <EyeSlash 
+                    size={20} 
+                    color="#5F5B62"
+                    />
+                    }
+                  </Pressable>
                 }
-              </Pressable>
-            }
+              />
+            )}
           />
-
+          
           <Button
+            onPress={handleSubmit(() => {})}
             bg={"blue.400"}
             borderRadius="6px"
             w="full"
             h="42px"
-            mt="32px"
+            mt="16px"
             _pressed={{
               backgroundColor: "blue.800"
             }}
