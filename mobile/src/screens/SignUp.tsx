@@ -29,7 +29,7 @@ const signOutSchema = yup.object({
   confirmed_password: yup.string().required("Confirme sua senha").oneOf([yup.ref("password")], "A confirmação da senha não confere."),
 });
 
-export function SignOut() {
+export function SignUp() {
   const [show, setShow] = useState(true);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();

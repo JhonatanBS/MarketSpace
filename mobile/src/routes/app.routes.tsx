@@ -1,10 +1,13 @@
 import { createBottomTabNavigator, BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 
+import { useTheme } from "native-base";
+
+import { House, SignOut, Tag } from "phosphor-react-native";
+
 import { Home } from "@screens/Home";
 import { MyAds } from "@screens/MyAds";
-import { SignIn } from "@screens/SignIn";
-import { useTheme } from "native-base";
-import { House, SignOut, Tag } from "phosphor-react-native";
+import { Loading } from "@components/Loading";
+
 import { Platform } from "react-native";
 
 type AuthRoutesProps = {
@@ -56,7 +59,7 @@ export function AppRoutes() {
 
       <Screen 
         name="logout"
-        component={SignIn}
+        component={Loading}
         options={{
           tabBarIcon: ({color}) => (
             <SignOut color={colors.red[400]} size={26}/>

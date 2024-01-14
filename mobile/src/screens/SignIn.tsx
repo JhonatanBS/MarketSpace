@@ -34,7 +34,7 @@ export function SignIn() {
   });
 
   function handleNewNavigationSignOut() {
-    navigation.navigate("signOut");
+    navigation.navigate("signUp");
   }
 
   return(
