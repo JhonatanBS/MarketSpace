@@ -8,9 +8,6 @@ import { THEME } from './src/theme';
 
 import { Loading } from "@components/Loading";
 
-import { SignIn } from '@screens/SignIn';
-import { SignOut } from '@screens/SignOut';
-
 import { Routes } from '@routes/index';
 
 export default function App() {

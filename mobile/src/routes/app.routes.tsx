@@ -16,7 +16,7 @@ type AuthRoutesProps = {
   logout: undefined;
 }
 
-export type AuthNavigatorRoutesProps = BottomTabNavigationProp<AuthRoutesProps>;
+export type AppNavigatorRoutesProps = BottomTabNavigationProp<AuthRoutesProps>;
 
 const { Screen, Navigator } = createBottomTabNavigator<AuthRoutesProps>();
 
