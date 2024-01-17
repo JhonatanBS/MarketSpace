@@ -230,8 +230,20 @@ export function Home() {
           h="600px"
           borderTopRadius={24}
           px="24px"
-          pt="48px"
         >
+          <Box 
+            h="4px"
+            w="full"
+            alignItems="center"
+            mt="12px"
+            mb="32px"
+          >
+            <Divider 
+              h="4px"
+              w="56px"
+              orientation="vertical"
+            />
+          </Box>
           <Box 
             flexDirection="row" 
             w="full"
