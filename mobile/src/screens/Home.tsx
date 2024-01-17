@@ -1,11 +1,25 @@
-import { Ad } from "@components/Ad";
+import { useState } from "react";
+
 import { useNavigation } from "@react-navigation/native";
+
+import { Ad } from "@components/Ad";
+
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
-import { Box, Button, Divider, HStack, Input, Pressable, ScrollView, Text, VStack, View } from "native-base";
-import { ArrowRight, MagnifyingGlass, Plus, Sliders, Tag, User } from "phosphor-react-native";
+
+import { Box, Button, Checkbox, Divider, HStack, Input, Pressable, ScrollView, Switch, Text, VStack, View } from "native-base";
+import { ArrowRight, MagnifyingGlass, Plus, Sliders, Tag, User, X } from "phosphor-react-native";
+import { Modal } from "react-native";
+import { ButtonNewOrUsed } from "@components/ButtonNewOrUsed";
+import { CheckBoxPayment } from "@components/CheckBoxPayment";
 
 export function Home() {
+  const [showModal, setShowModal] = useState(false);
+
+  const [ newObject, setNewObject ] = useState(false);
+  const [ usedObject, setUsedObject ] = useState(false);
+  const [ accepetedExchange, setAccepetedExchange ] = useState(false);
+  
+
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -14,6 +28,7 @@ export function Home() {
   }
 
   return(
+    <>
     <VStack flex={1} px="24px">
       <HStack w="full" h="45px" mt={20} justifyContent="space-between">
         
@@ -177,7 +192,7 @@ export function Home() {
             mx="12px"
             />
           
-          <Pressable onPress={() => console.log("Ola mundo")}>
+          <Pressable onPress={() => setShowModal(true)}>
             <Sliders size={20} color="#3E3A40"/>
           </Pressable>
         </Box>}
@@ -201,6 +216,158 @@ export function Home() {
           <Ad />
         </Box>
       </ScrollView>
+
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={showModal}
+      statusBarTranslucent
+    >
+      <View flex={1} backgroundColor= {"rgba(0, 0, 0, 0.5)"} justifyContent="flex-end">
+        <View 
+          bg="gray.700" 
+          h="600px"
+          borderTopRadius={24}
+          px="24px"
+          pt="48px"
+        >
+          <Box 
+            flexDirection="row" 
+            w="full"
+            h="26px"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Text
+              fontFamily="heading"
+              fontSize="lg"
+              color="gray.100"
+            >
+              Filtrar anúncios
+            </Text>
+              
+            <Pressable onPress={() => setShowModal(false)}>
+              <X size={24} color="#9F9BA1"/>
+            </Pressable>
+          </Box>
+
+          <Text
+            fontFamily="heading"
+            fontSize="sm"
+            color="gray.200"
+            mt="24px"
+            mb="12px"
+          >
+            Condição
+          </Text>
+          
+          <HStack w="153px" h="28px" justifyContent="space-between">
+            <ButtonNewOrUsed 
+              title="Novo"
+              selected={newObject}
+              onPress={() => setNewObject(!newObject)}
+            />
+
+            <ButtonNewOrUsed 
+              title="Usado"
+              selected={usedObject}
+              onPress={() => setUsedObject(!usedObject)}
+            />
+          </HStack>
+
+          <Text
+            fontFamily="heading"
+            fontSize="sm"
+            color="gray.200"
+            mt="24px"
+            mb="12px"
+          >
+            Aceita troca?
+          </Text>
+
+          <Switch 
+            h="28px"
+            w="50px"
+            size="lg"
+            isChecked={accepetedExchange}
+          />
+
+          <Text
+            fontFamily="heading"
+            fontSize="sm"
+            color="gray.200"
+            mt="24px"
+            mb="12px"
+          >
+            Meios de pagamento aceitos
+          </Text>
+          
+          <CheckBoxPayment 
+            title="Boleto"
+          />
+
+          <CheckBoxPayment 
+            title="Pix"
+          />
+
+          <CheckBoxPayment 
+            title="Dinheiro"
+          />
+
+          <CheckBoxPayment 
+            title="Cartão de Crédito"
+          />
+
+          <CheckBoxPayment 
+            title="Depósito Bancário"
+          />
+
+          <Box 
+            flexDirection="row" 
+            justifyContent="space-between"
+            mt="53px"
+          >
+            <Button
+              h="42px"
+              w="170px"
+              borderRadius={6}
+              bg="gray.500"
+              _text={{
+                fontFamily: "heading",
+                fontSize: "sm",
+                color: "gray.200"
+              }}
+              _pressed={{
+                backgroundColor: "gray.600"
+              }}
+
+            >
+              Resetar filtros
+            </Button>
+
+            <Button
+              h="42px"
+              w="170px"
+              borderRadius={6}
+              bg="gray.100"
+              _text={{
+                fontFamily: "heading",
+                fontSize: "sm",
+                color: "gray.700"
+              }}
+              _pressed={{
+                backgroundColor: "gray.200"
+              }}
+            >
+              Aplicar filtros
+            </Button>
+          </Box>
+
+        </View>    
+      </View> 
+      </Modal>
     </VStack>
+
+    </>
   )
   }
