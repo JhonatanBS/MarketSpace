@@ -1,4 +1,5 @@
 import { Checkbox, Text } from "native-base";
+import { Animated } from "react-native";
 
 type PropsCheckBox = {
   title: string;
@@ -7,7 +8,7 @@ type PropsCheckBox = {
 export function CheckBoxPayment({title}: PropsCheckBox) {
   return(
     <Checkbox
-     colorScheme="blue"
+     colorScheme="primary"
      value={title}
      mb="11px"
     >

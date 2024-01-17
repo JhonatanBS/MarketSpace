@@ -18,7 +18,8 @@ export const THEME = extendTheme(
       },
       red: {
         400: '#EE7979'
-      }
+      },
+      primary: { 600: "#647AC7"}
     },
     fonts: {
       heading: 'Karla_700Bold',

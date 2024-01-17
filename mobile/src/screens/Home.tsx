@@ -11,6 +11,7 @@ import { ArrowRight, MagnifyingGlass, Plus, Sliders, Tag, User, X } from "phosph
 import { Modal } from "react-native";
 import { ButtonNewOrUsed } from "@components/ButtonNewOrUsed";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
+import { SwitchExchange } from "@components/SwitchExchange";
 
 export function Home() {
   const [showModal, setShowModal] = useState(false);
@@ -19,7 +20,7 @@ export function Home() {
   const [ usedObject, setUsedObject ] = useState(false);
   const [ accepetedExchange, setAccepetedExchange ] = useState(false);
   
-
+  console.log(accepetedExchange)
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -285,12 +286,10 @@ export function Home() {
             Aceita troca?
           </Text>
 
-          <Switch 
-            h="28px"
-            w="50px"
-            size="lg"
-            isChecked={accepetedExchange}
-          />
+         <SwitchExchange 
+           type={accepetedExchange}
+           onPress={() => setAccepetedExchange(!accepetedExchange)}
+         />
 
           <Text
             fontFamily="heading"
