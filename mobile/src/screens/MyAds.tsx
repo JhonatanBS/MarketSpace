@@ -10,7 +10,6 @@ export function MyAds() {
   return(
     <Box 
       flex={1} 
-      
       px="24px"
       pt="64px"
     >

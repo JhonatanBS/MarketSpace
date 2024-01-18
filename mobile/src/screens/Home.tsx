@@ -6,7 +6,7 @@ import { Ad } from "@components/Ad";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
-import { Box, Button, Checkbox, Divider, HStack, Input, Pressable, ScrollView, Switch, Text, VStack, View } from "native-base";
+import { Box, Button, Divider, HStack, Input, Pressable, ScrollView, Text, VStack, View } from "native-base";
 import { ArrowRight, MagnifyingGlass, Plus, Sliders, Tag, User, X } from "phosphor-react-native";
 import { Modal } from "react-native";
 import { ButtonNewOrUsed } from "@components/ButtonNewOrUsed";
@@ -23,6 +23,10 @@ export function Home() {
   console.log(accepetedExchange)
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  function newNavigationCreateAd() {
+    navigation.navigate("createAd");
+  }
 
   function newNavigationMyAds() {
     navigation.navigate("myAds");
@@ -73,6 +77,7 @@ export function Home() {
             fontFamily: "heading",
             fontSize: "sm",
           }}
+          onPress={newNavigationCreateAd}
         >
           Criar anúncio
         </Button>
@@ -373,7 +378,6 @@ export function Home() {
               Aplicar filtros
             </Button>
           </Box>
-
         </View>    
       </View> 
       </Modal>
