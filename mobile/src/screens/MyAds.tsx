@@ -1,4 +1,6 @@
 import { Ad } from "@components/Ad";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { Box, Pressable, ScrollView, Text, View } from "native-base";
 import { CaretDown, CaretUp, Plus } from "phosphor-react-native";
 import { useState } from "react";
@@ -6,6 +8,16 @@ import { useState } from "react";
 export function MyAds() {
   const [ chooseFilter, setChooseFilter ] = useState("Todos");
   const [ buttonFilter, setButtonFilter] = useState(false);
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  function handleNewNavigationCreateAd() {
+    navigation.navigate("createAd");
+  }
+
+  function handleNewNavigationDetailsMyAds() {
+    navigation.navigate("detailsMyAds");
+  }
   
   return(
     <Box 
@@ -30,7 +42,7 @@ export function MyAds() {
           position="absolute"
           right={0}
           top={0.55}
-          onPress={() => {}}
+          onPress={handleNewNavigationCreateAd}
         >
           <Plus 
             size={24} 
@@ -145,11 +157,26 @@ export function MyAds() {
           flexWrap="wrap"
           justifyContent="space-between"
         >
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
+          <Ad 
+            onPress={handleNewNavigationDetailsMyAds}
+          />
+
+          <Ad 
+            onPress={handleNewNavigationDetailsMyAds}
+          />
+
+          <Ad 
+            onPress={handleNewNavigationDetailsMyAds}
+          />
+
+          <Ad 
+            onPress={handleNewNavigationDetailsMyAds}
+          />
+
+          <Ad 
+            onPress={handleNewNavigationDetailsMyAds}
+          />
+          
         </Box>
       </ScrollView>
 

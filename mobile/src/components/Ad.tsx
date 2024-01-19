@@ -1,8 +1,18 @@
-import { AspectRatio, Box, Text, Image } from "native-base";
+import {  Box, Text, Image, Pressable, IPressableProps } from "native-base";
 
-export function Ad() {
+type AdProps = IPressableProps & {
+
+}
+
+export function Ad({...rest} : AdProps) {
   return(
-    <Box h="143px" w="169px" borderRadius={6} mb="24px">
+    <Pressable 
+      h="143px" 
+      w="169px" 
+      borderRadius={6} 
+      mb="24px"
+      {...rest}
+    >
       <Box 
         borderRadius={6} 
         w="full" 
@@ -85,6 +95,6 @@ export function Ad() {
           {" 59,90"}
         </Text>
       </Text>
-    </Box>
+    </Pressable>
   )
 }
