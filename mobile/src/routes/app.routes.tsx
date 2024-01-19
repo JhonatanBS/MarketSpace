@@ -11,12 +11,14 @@ import { Loading } from "@components/Loading";
 import { Platform } from "react-native";
 import { CreateAd } from "@screens/CreateAd";
 import { DetailsMyAds } from "@screens/DetailsMyAds";
+import { EditAd } from "@screens/EditAd";
 
 type AuthRoutesProps = {
   home: undefined;
   myAds: undefined;
   logout: undefined;
   createAd: undefined;
+  editAd: undefined;
   detailsMyAds: undefined;
 }
 
@@ -74,6 +76,15 @@ export function AppRoutes() {
       <Screen 
         name="createAd"
         component={CreateAd}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none"}
+        }}
+      />
+
+      <Screen 
+        name="editAd"
+        component={EditAd}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: "none"}

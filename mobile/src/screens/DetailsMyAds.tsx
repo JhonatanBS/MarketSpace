@@ -13,7 +13,7 @@ export function DetailsMyAds() {
   }
 
   function handleNewNavigationEditMyAd() {
-    navigation.navigate("home");
+    navigation.navigate("editAd");
   }
 
   return (
