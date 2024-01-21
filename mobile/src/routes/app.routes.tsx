@@ -12,6 +12,7 @@ import { Platform } from "react-native";
 import { CreateAd } from "@screens/CreateAd";
 import { DetailsMyAds } from "@screens/DetailsMyAds";
 import { EditAd } from "@screens/EditAd";
+import { PublicAd } from "@screens/PublishAd";
 
 type AuthRoutesProps = {
   home: undefined;
@@ -20,6 +21,7 @@ type AuthRoutesProps = {
   createAd: undefined;
   editAd: undefined;
   detailsMyAds: undefined;
+  publishAd: undefined;
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AuthRoutesProps>;
@@ -76,6 +78,15 @@ export function AppRoutes() {
       <Screen 
         name="createAd"
         component={CreateAd}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none"}
+        }}
+      />
+
+      <Screen 
+        name="publishAd"
+        component={PublicAd}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: "none"}
