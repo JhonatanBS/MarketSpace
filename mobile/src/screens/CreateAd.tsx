@@ -13,6 +13,7 @@ import { useState } from "react";
 import { TypeProduct } from "@components/TypeProduct";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 type FormDataProps = {
   title: string;
@@ -31,7 +32,7 @@ export function CreateAd() {
   const [usedProduct, setUsedProduct] = useState(false);
   const [accepetedExchange, setAccepetedExchange] = useState(false);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
@@ -40,6 +41,11 @@ export function CreateAd() {
   function handleGoBack() {
     navigation.goBack();
   }
+
+  function handleNewNavigationPublishAd() {
+    navigation.navigate("publishAd")
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} mt="45px">
       <VStack
@@ -287,6 +293,8 @@ export function CreateAd() {
             backgroundColor: "gray.600"
           }}
 
+          onPress={handleGoBack}
+
         >
           Cancelar
         </Button>
@@ -304,6 +312,7 @@ export function CreateAd() {
           _pressed={{
             backgroundColor: "gray.200"
           }}
+          onPress={handleNewNavigationPublishAd}
         >
           Avançar
         </Button>
