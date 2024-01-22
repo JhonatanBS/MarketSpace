@@ -3,5 +3,5 @@ export type UserDTO = {
   avatar: string;
   name: string;
   email: string;
-  phone: string;
+  tel: string;
 }

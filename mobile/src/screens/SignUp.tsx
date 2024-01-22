@@ -1,6 +1,8 @@
-import { Box, Button, Center, Heading, Pressable, ScrollView, Text, VStack } from "native-base";
+import { Box, Button, Center, Heading, Pressable, ScrollView, Text, VStack, useToast } from "native-base";
 
 import LogoSVG from "@assets/logo.svg";
+
+import { api } from "@services/api";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,11 +14,12 @@ import { Eye, EyeSlash, PencilSimpleLine, User } from "phosphor-react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
+import { AppError } from "@utils/AppError";
 
 type FormDataProps = {
   name: string;
   email: string;
-  phone: string;
+  tel: string;
   password: string;
   confirmed_password: string;
 }
@@ -24,7 +27,7 @@ type FormDataProps = {
 const signOutSchema = yup.object({
   name: yup.string().required("Informe seu nome"),
   email: yup.string().required("Informe seu e-mail").email("E-mail inválido"),
-  phone: yup.string().required("Informe seu telefone"),
+  tel: yup.string().required("Informe seu telefone"),
   password: yup.string().required("Informe sua senha").min(6, "Insira pelo menos 6 digitos"),
   confirmed_password: yup.string().required("Confirme sua senha").oneOf([yup.ref("password")], "A confirmação da senha não confere."),
 });
@@ -33,6 +36,7 @@ export function SignUp() {
   const [show, setShow] = useState(true);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+  const toast = useToast();
 
   const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signOutSchema)
@@ -40,6 +44,22 @@ export function SignUp() {
 
   function handleNewNavigationSignIn() {
     navigation.navigate("signIn");
+  }
+
+  async function handleSignUp({ name, email, tel, password  }: FormDataProps) {
+    try {
+      await api.post("/users", {name, email, tel, password});
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError ? error.message : "Não foi possível cadastrar. Tente novamente mais tarde"
+    
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.400"
+      });
+    }
   }
 
   return (
@@ -130,13 +150,13 @@ export function SignUp() {
           
           <Controller 
             control={control}
-            name="phone"
+            name="tel"
             render={({ field: { onChange, value}}) => (
               <InputForm 
                 placeholder="Telefone"
                 onChangeText={onChange}
                 value={value}
-                errorMessage={errors.phone?.message}
+                errorMessage={errors.tel?.message}
           />
             )}
           />
@@ -200,7 +220,7 @@ export function SignUp() {
           />
 
           <Button
-            onPress={handleSubmit(() => {})}
+            onPress={handleSubmit(handleSignUp)}
             bg={"gray.100"}
             borderRadius="6px"
             w="full"

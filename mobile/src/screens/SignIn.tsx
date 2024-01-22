@@ -54,7 +54,7 @@ export function SignIn() {
         title,
         placement: "top",
         bgColor: "red.400"
-      })
+      });
     }
   }
 
