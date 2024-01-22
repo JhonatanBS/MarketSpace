@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Center, Heading, Pressable, ScrollView, Text, VStack, theme } from "native-base";
+import { Button, Center, Heading, Pressable, ScrollView, Text, VStack, theme, useToast } from "native-base";
 
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
@@ -14,6 +14,7 @@ import { useForm , Controller } from "react-hook-form";
 import { Eye, EyeSlash } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@hooks/useAuth";
+import { AppError } from "@utils/AppError";
 
 type FormDataProps = {
   email: string;
@@ -29,6 +30,7 @@ export function SignIn() {
   const [show, setShow] = useState(false);
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+  const toast = useToast();
 
   const { signIn } = useAuth();
 
@@ -40,8 +42,20 @@ export function SignIn() {
     navigation.navigate("signUp");
   }
 
-  function handleSignIn({ email, password }: FormDataProps) {
-    signIn(email, password);
+  async function handleSignIn({ email, password }: FormDataProps) {
+    try {
+      await signIn(email, password);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente mais tarde"
+    
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.400"
+      })
+    }
   }
 
   return(
