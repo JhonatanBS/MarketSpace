@@ -13,6 +13,7 @@ import { useForm , Controller } from "react-hook-form";
 
 import { Eye, EyeSlash } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "@hooks/useAuth";
 
 type FormDataProps = {
   email: string;
@@ -29,12 +30,18 @@ export function SignIn() {
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
+  const { signIn } = useAuth();
+
   const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
   });
 
   function handleNewNavigationSignOut() {
     navigation.navigate("signUp");
+  }
+
+  function handleSignIn({ email, password }: FormDataProps) {
+    signIn(email, password);
   }
 
   return(
@@ -71,7 +78,6 @@ export function SignIn() {
             name="email"
             render={({ field: { onChange, value}}) => (
               <InputForm 
-                
                 placeholder="E-mail"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -112,7 +118,7 @@ export function SignIn() {
           />
           
           <Button
-            onPress={handleSubmit(() => {})}
+            onPress={handleSubmit(handleSignIn)}
             bg={"blue.400"}
             borderRadius="6px"
             w="full"
