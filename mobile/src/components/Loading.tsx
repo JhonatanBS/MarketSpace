@@ -1,12 +1,11 @@
-import { Center, Spinner } from "native-base";
-
-import { THEME } from "../theme/index";
+import { Center, Spinner, useTheme } from "native-base";
 
 export function Loading() {
+  const { colors } = useTheme();
   return(
-    <Center flex={1} backgroundColor={THEME.colors.gray[600]}>
+    <Center flex={1} backgroundColor={colors.gray[600]}>
       <Spinner 
-        color={THEME.colors.blue.dark} 
+        color={colors.blue[800]} 
         size="xl" 
       />
     </Center>
