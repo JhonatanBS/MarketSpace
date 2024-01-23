@@ -34,7 +34,7 @@ export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
   const toast = useToast();
 
-  const { signIn } = useAuth();
+  const { signIn, isLoadingUserStorageData } = useAuth();
 
   const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
@@ -54,6 +54,7 @@ export function SignIn() {
       const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente mais tarde"
     
       setIsLoading(false);
+      
       toast.show({
         title,
         placement: "top",

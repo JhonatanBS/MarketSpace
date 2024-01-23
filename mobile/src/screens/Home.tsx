@@ -12,6 +12,7 @@ import { Modal } from "react-native";
 import { ButtonNewOrUsed } from "@components/ButtonNewOrUsed";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
+import { useAuth } from "@hooks/useAuth";
 
 export function Home() {
   const [showModal, setShowModal] = useState(false);
@@ -23,6 +24,8 @@ export function Home() {
   console.log(accepetedExchange)
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const { user } = useAuth();
 
   function newNavigationCreateAd() {
     navigation.navigate("createAd");
