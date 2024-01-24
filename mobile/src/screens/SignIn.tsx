@@ -15,7 +15,6 @@ import { Eye, EyeSlash } from "phosphor-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "@hooks/useAuth";
 import { AppError } from "@utils/AppError";
-import { Loading } from "@components/Loading";
 
 type FormDataProps = {
   email: string;
@@ -34,7 +33,7 @@ export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
   const toast = useToast();
 
-  const { signIn, isLoadingUserStorageData } = useAuth();
+  const { signIn } = useAuth();
 
   const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
@@ -51,7 +50,7 @@ export function SignIn() {
     } catch (error) {
       const isAppError = error instanceof AppError;
 
-      const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente mais tarde"
+      const title = isAppError ? error.message : "Não foi possível entrar. Tente novamente mais tarde";
     
       setIsLoading(false);
       

@@ -6,13 +6,14 @@ import { Ad } from "@components/Ad";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
-import { Box, Button, Divider, HStack, Input, Pressable, ScrollView, Text, VStack, View } from "native-base";
+import { Box, Button, Divider, HStack, Input, Pressable, ScrollView, Text, VStack, View, Image } from "native-base";
 import { ArrowRight, MagnifyingGlass, Plus, Sliders, Tag, User, X } from "phosphor-react-native";
 import { Modal } from "react-native";
 import { ButtonNewOrUsed } from "@components/ButtonNewOrUsed";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { useAuth } from "@hooks/useAuth";
+import { api } from "@services/api";
 
 export function Home() {
   const [showModal, setShowModal] = useState(false);
@@ -20,8 +21,6 @@ export function Home() {
   const [ newObject, setNewObject ] = useState(false);
   const [ usedObject, setUsedObject ] = useState(false);
   const [ accepetedExchange, setAccepetedExchange ] = useState(false);
-  
-  console.log(accepetedExchange)
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -50,14 +49,23 @@ export function Home() {
             justifyContent="center"
             alignItems="center"
           >
+            { user.avatar ?
+            <Image 
+              src={`${api.defaults.baseURL}/images/${user.avatar}`}
+              h="full"
+              w="full"
+              rounded="full"
+              alt="Foto do perfil"
+            />
+            :
             <User size={30} color="#647AC7"/>
+            } 
           </Pressable>
-          
           <View ml="10px">
             <Text color="gray.100" fontFamily="body">
               Boas vindas,
             </Text>
-            <Text fontFamily="heading">Maria!</Text> 
+            <Text fontFamily="heading">{user.name}!</Text> 
           </View>
         </Box>
 
