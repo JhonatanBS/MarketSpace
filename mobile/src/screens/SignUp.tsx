@@ -1,4 +1,4 @@
-import { Box, Button, Center, Heading, Pressable, ScrollView, Text, VStack, useToast } from "native-base";
+import { Box, Button, Center, Heading, Image, Pressable, ScrollView, Text, VStack, useToast } from "native-base";
 
 import LogoSVG from "@assets/logo.svg";
 
@@ -6,6 +6,9 @@ import { api } from "@services/api";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from 'expo-file-system';
 
 import { useForm , Controller } from "react-hook-form";
 
@@ -15,6 +18,7 @@ import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 import { AppError } from "@utils/AppError";
+import { useAuth } from "@hooks/useAuth";
 
 type FormDataProps = {
   name: string;
@@ -34,9 +38,12 @@ const signOutSchema = yup.object({
 
 export function SignUp() {
   const [show, setShow] = useState(true);
+  const [userPhoto, setUserPhoto] = useState("");
 
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
   const toast = useToast();
+
+  const { signIn } = useAuth();
 
   const { control, handleSubmit, formState: { errors }} = useForm<FormDataProps>({
     resolver: yupResolver(signOutSchema)
@@ -48,7 +55,35 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, tel, password  }: FormDataProps) {
     try {
-      await api.post("/users", {name, email, tel, password});
+      const fileExtension = userPhoto.split(".").pop();
+
+      const photoFile = {
+        name: `default.${fileExtension}`,
+        uri: userPhoto,
+        type: `image/${fileExtension}`
+      } as any;
+
+      const userPhotoUploadForm = new FormData();
+      userPhotoUploadForm.append("avatar", photoFile);
+      userPhotoUploadForm.append("name", name);
+      userPhotoUploadForm.append("email", email);
+      userPhotoUploadForm.append("tel", tel);
+      userPhotoUploadForm.append("password", password);
+      
+      await api.post("/users", userPhotoUploadForm, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      toast.show({
+        title: "Cadastro realizado com sucesso",
+        placement: "top",
+        bgColor: "green.400"
+      });
+
+      await signIn(email, password);
+
     } catch (error) {
       const isAppError = error instanceof AppError;
 
@@ -59,6 +94,36 @@ export function SignUp() {
         placement: "top",
         bgColor: "red.400"
       });
+    }
+  }
+
+  async function handleUserPhotoSelectSignUp() {
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if(photoSelected.canceled) {
+        return;
+      }
+
+      if(photoSelected.assets[0].uri) {
+        const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0].uri, { size: true});
+
+        /*if(photoInfo.size && (photoInfo.size / 1024 / 1024) > 5) {
+          return toast.show({
+            title: "Essa imagem é muito grande. Escolha um de até 5MB",
+            placement: "top",
+            bgColor: "red.500"
+          })
+        }*/
+        setUserPhoto(photoSelected.assets[0].uri);
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -102,22 +167,34 @@ export function SignUp() {
             alignItems="center"
             mt="32px"
             mb="16px"
+            onPress={handleUserPhotoSelectSignUp}
           >
-            <User size={50} color="#9F9BA1"/>
+            { userPhoto ? 
+            <Image
+              size="full"
+              source={{uri: userPhoto}}
+              alt="Foto de perfil do usuário"
+              rounded="full"
+            />
+            :
+            <>
+              <User size={50} color="#9F9BA1"/>
 
-            <Box 
-              bg="blue.400"
-              h="40px"
-              w="40px"
-              borderRadius={50}
-              justifyContent="center"
-              alignItems="center"
-              position="absolute"
-              right={-8}
-              bottom={-8}
-            >
-              <PencilSimpleLine color="#EDECEE" size={16}/>
-            </Box>
+              <Box 
+                bg="blue.400"
+                h="40px"
+                w="40px"
+                borderRadius={50}
+                justifyContent="center"
+                alignItems="center"
+                position="absolute"
+                right={-8}
+                bottom={-8}
+              >
+                <PencilSimpleLine color="#EDECEE" size={16}/>
+              </Box>
+            </>
+            }
           </Pressable>
 
           <Controller 
