@@ -3,11 +3,14 @@ import { useNavigation } from "@react-navigation/native";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from 'expo-file-system';
+
 import { Controller, useForm } from "react-hook-form";
 
-import { ArrowLeft, Plus } from "phosphor-react-native";
+import { ArrowLeft, Plus, X, XCircle } from "phosphor-react-native";
 
-import { Box, Pressable, VStack, Text, ScrollView, Button } from "native-base";
+import { Box, Pressable, VStack, Text, ScrollView, Button, FlatList, Image, HStack } from "native-base";
 import { InputForm } from "@components/InputForm";
 import { useState } from "react";
 import { TypeProduct } from "@components/TypeProduct";
@@ -28,6 +31,7 @@ const signInSchema = yup.object({
 });
 
 export function CreateAd() {
+  const [addImageProduct, setAddImageProduct] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState(false);
   const [usedProduct, setUsedProduct] = useState(false);
   const [accepetedExchange, setAccepetedExchange] = useState(false);
@@ -44,6 +48,42 @@ export function CreateAd() {
 
   function handleNewNavigationPublishAd() {
     navigation.navigate("publishAd")
+  }
+
+  async function handleUserPhotoSelectSignUp() {
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (photoSelected.canceled) {
+        return;
+      }
+
+      if (photoSelected.assets[0].uri) {
+        const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0].uri, { size: true });
+
+        /*if(photoInfo.size && (photoInfo.size / 1024 / 1024) > 5) {
+          return toast.show({
+            title: "Essa imagem é muito grande. Escolha um de até 5MB",
+            placement: "top",
+            bgColor: "red.500"
+          })
+        }*/
+        setAddImageProduct([...addImageProduct, photoSelected.assets[0].uri])
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  function handlePhotoDeleteAd(uriImage: string ) {
+    const imageFilter = addImageProduct.filter((image) => image !== uriImage);
+
+    setAddImageProduct(imageFilter);
   }
 
   return (
@@ -99,28 +139,70 @@ export function CreateAd() {
           fontFamily="body"
           fontSize="sm"
           color="gray.300"
+          mb="16px"
         >
           Escolha até 3 imagens para mostrar o quando o seu produto é incrível!
         </Text>
 
-        <Pressable
+
+        <Box
+          w="full"
           h="100px"
-          w="100px"
-          mt="16px"
-          mb="32px"
-          rounded={6}
-          bg="gray.500"
-          justifyContent="center"
-          alignItems="center"
-          onPress={() => console.log("Inserir foto")}
+          flexDirection="row"
         >
-          <Plus size={24} color="#9F9BA1" />
-        </Pressable>
+          {
+            addImageProduct.map((item, index) => (
+              <Box
+                h="100px"
+                w="100px"
+                mr="8px"
+                rounded={6}
+                key={index}
+                position="relative"
+                alignItems="flex-end"
+              >
+                <Image
+                  alt="Foto do produto do anunciante"
+                  source={{ uri: item }}
+                  h="full"
+                  w="full"
+                  rounded={6}
+                  position="absolute"
+                />
+
+                <Pressable
+                  mr="4px"
+                  mt="4px"
+                  rounded="full"
+                  onPress={() => handlePhotoDeleteAd(item)}
+                >
+                  <XCircle size={16} weight="fill" color="#3E3A40"/>
+                </Pressable>
+              </Box>
+            ))
+          }
+
+          {addImageProduct.length < 3 &&
+            <Pressable
+              h="100px"
+              w="100px"
+              rounded={6}
+              bg="gray.500"
+              justifyContent="center"
+              alignItems="center"
+              onPress={handleUserPhotoSelectSignUp}
+            >
+              <Plus size={24} color="#9F9BA1" />
+            </Pressable>
+
+          }
+        </Box>
 
         <Text
           fontFamily="heading"
           fontSize="sm"
           color="gray.200"
+          mt="32px"
           mb="16px"
         >
           Sobre o produto

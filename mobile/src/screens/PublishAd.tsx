@@ -1,12 +1,17 @@
 import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
+import { useAuth } from "@hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { Box, Button, Center, HStack, Pressable, Text, VStack } from "native-base";
+import { api } from "@services/api";
+import { Box, Button, Center, HStack, Pressable, Text, VStack, Image } from "native-base";
 import { ArrowLeft, Tag, User } from "phosphor-react-native";
+import { useState } from "react";
 
 export function PublicAd() {
   
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const { user } = useAuth();
 
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
@@ -54,6 +59,7 @@ export function PublicAd() {
         flex={1}
       >
         <HStack mb="24px">
+          
           <Pressable
             h="24px"
             w="24px"
@@ -63,7 +69,17 @@ export function PublicAd() {
             justifyContent="center"
             alignItems="center"
           >
-            <User size={20} color="#647AC7" />
+
+           { user.avatar ?
+             <Image 
+             src={`${api.defaults.baseURL}/images/${user.avatar}`}
+             h="full"
+             w="full"
+             rounded="full"
+             alt="Foto do perfil"
+           />
+           :
+           <User size={20} color="#647AC7" />}
           </Pressable>
 
           <Text
@@ -72,7 +88,7 @@ export function PublicAd() {
             fontSize="sm"
             ml="8px"
           >
-            Maria Gomes
+           {user.name}
           </Text>
         </HStack>
 
@@ -181,12 +197,12 @@ export function PublicAd() {
         <Button
           h="42px"
           w="175px"
-          bg="blue.400"
+          bg="gray.500"
           borderRadius="6px"
           startIcon={
             <ArrowLeft
               size={16}
-              color="#EDECEE"
+              color="#3E3A40"
               weight="bold"
             />}
           _pressed={{
@@ -195,7 +211,7 @@ export function PublicAd() {
           _text={{
             fontFamily: "heading",
             fontSize: "sm",
-            color: "gray.700",
+            color: "gray.200",
             marginLeft: "8px"
           }}
         onPress={handleNewNavigationEditAd}
@@ -206,21 +222,21 @@ export function PublicAd() {
         <Button
           h="42px"
           w="175px"
-          bg="gray.500"
+          bg="blue.400"
           borderRadius="6px"
           startIcon={
             <Tag
               size={16}
-              color="#5F5B62"
+              color="#F7F7F8"
               weight="bold"
             />}
           _pressed={{
-            backgroundColor: "gray.600"
+            backgroundColor: "blue.400"
           }}
           _text={{
             fontFamily: "heading",
             fontSize: "sm",
-            color: "gray.200",
+            color: "gray.700",
             marginLeft: "8px"
           }}
           onPress={handleNewNavigationMyAds}
