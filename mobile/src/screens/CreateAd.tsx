@@ -8,20 +8,26 @@ import * as FileSystem from 'expo-file-system';
 
 import { Controller, useForm } from "react-hook-form";
 
-import { ArrowLeft, Plus, X, XCircle } from "phosphor-react-native";
+import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
 
-import { Box, Pressable, VStack, Text, ScrollView, Button, FlatList, Image, HStack } from "native-base";
+import { Box, Pressable, VStack, Text, ScrollView, Button, Image, useToast } from "native-base";
 import { InputForm } from "@components/InputForm";
 import { useState } from "react";
 import { TypeProduct } from "@components/TypeProduct";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { AppError } from "@utils/AppError";
 
 type FormDataProps = {
   title: string;
   description: string;
   price: string;
+}
+
+type methodsPaymentProps = {
+  title: string;
+  isCheck: boolean;
 }
 
 const signInSchema = yup.object({
@@ -32,11 +38,36 @@ const signInSchema = yup.object({
 
 export function CreateAd() {
   const [addImageProduct, setAddImageProduct] = useState<string[]>([]);
-  const [newProduct, setNewProduct] = useState(false);
-  const [usedProduct, setUsedProduct] = useState(false);
+  const [newProduct, setNewProduct] = useState<boolean>(false);
   const [accepetedExchange, setAccepetedExchange] = useState(false);
+  const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
+
+  const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
+    {
+      title: "Boleto",
+      isCheck: false
+    },
+    {
+      title: "Pix",
+      isCheck: false
+    },
+    {
+      title: "Dinheiro",
+      isCheck: false
+    },
+    {
+      title: "Cartão de Crédito",
+      isCheck: false
+    },
+    {
+      title: "Depósito Bancário",
+      isCheck: false
+    },
+  ]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const toast = useToast();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(signInSchema)
@@ -46,8 +77,39 @@ export function CreateAd() {
     navigation.goBack();
   }
 
-  function handleNewNavigationPublishAd() {
-    navigation.navigate("publishAd")
+  function handleNewNavigationPublishAd({ title, description, price}: FormDataProps) {
+    try {
+
+      if(addImageProduct.length === 0 || methodsPayment .length === 0) {
+        return toast.show({
+          title: "As imagens e os meios de pagamento são obrigatórios!",
+          placement: "top",
+          bgColor: "red.400"
+        });
+      }
+
+      navigation.navigate("publishAd", {
+        imageProduct: addImageProduct,
+        name: title,
+        description,
+        price,
+        is_new: newProduct,
+        accept_trade: accepetedExchange,
+        payment_methods: [methodsPayment]
+      });
+
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError ? error.message : "Não foi possível avançar. Tente novamente mais tarde";
+    
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.400"
+      });
+    }
+    
   }
 
   async function handleUserPhotoSelectSignUp() {
@@ -80,10 +142,28 @@ export function CreateAd() {
     }
   }
 
-  function handlePhotoDeleteAd(uriImage: string ) {
+  function handlePhotoDeleteAd(uriImage: string) {
     const imageFilter = addImageProduct.filter((image) => image !== uriImage);
 
     setAddImageProduct(imageFilter);
+  }
+
+  function handleIsCheckInMethodsPayment(title: string) {
+    const updateMethodPayment = allMethodsPayment.map((data) => {
+      data.title === title ? 
+        (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, title]) : handleRemoveMethodsPayment(title))
+        : 
+         data.isCheck
+          return data;
+    }
+    );
+
+    setAllMethodsPayment(updateMethodPayment);
+  }
+
+  function handleRemoveMethodsPayment(method: string) {
+    const removeMethodPayment = methodsPayment.filter((titleMethod) => titleMethod !== method);
+    setMethodsPayment(removeMethodPayment);
   }
 
   return (
@@ -176,7 +256,7 @@ export function CreateAd() {
                   rounded="full"
                   onPress={() => handlePhotoDeleteAd(item)}
                 >
-                  <XCircle size={16} weight="fill" color="#3E3A40"/>
+                  <XCircle size={16} weight="fill" color="#3E3A40" />
                 </Pressable>
               </Box>
             ))
@@ -246,7 +326,7 @@ export function CreateAd() {
         >
           <TypeProduct
             type={newProduct}
-            onPress={() => { setNewProduct(true), setUsedProduct(false) }}
+            onPress={() => { setNewProduct(true) }}
           />
           <Text
             fontFamily="body"
@@ -259,8 +339,8 @@ export function CreateAd() {
           </Text>
 
           <TypeProduct
-            type={usedProduct}
-            onPress={() => { setNewProduct(false), setUsedProduct(true) }}
+            type={!newProduct}
+            onPress={() => { setNewProduct(false) }}
           />
           <Text
             fontFamily="body"
@@ -331,25 +411,13 @@ export function CreateAd() {
           Meios de pagamento aceitos
         </Text>
 
-        <CheckBoxPayment
-          title="Boleto"
-        />
-
-        <CheckBoxPayment
-          title="Pix"
-        />
-
-        <CheckBoxPayment
-          title="Dinheiro"
-        />
-
-        <CheckBoxPayment
-          title="Cartão de Crédito"
-        />
-
-        <CheckBoxPayment
-          title="Depósito Bancário"
-        />
+        {allMethodsPayment.map((data) => (
+          <CheckBoxPayment
+            title={data.title}
+            type={data.isCheck}
+            onPress={ () =>  handleIsCheckInMethodsPayment(data.title)}
+          />
+        ))}
       </VStack>
 
       <Box
@@ -376,7 +444,6 @@ export function CreateAd() {
           }}
 
           onPress={handleGoBack}
-
         >
           Cancelar
         </Button>
@@ -394,7 +461,7 @@ export function CreateAd() {
           _pressed={{
             backgroundColor: "gray.200"
           }}
-          onPress={handleNewNavigationPublishAd}
+          onPress={handleSubmit(handleNewNavigationPublishAd)}
         >
           Avançar
         </Button>

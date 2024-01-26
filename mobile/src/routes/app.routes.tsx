@@ -15,6 +15,7 @@ import { EditAd } from "@screens/EditAd";
 import { PublicAd } from "@screens/PublishAd";
 import { useAuth } from "@hooks/useAuth";
 import { Logout } from "@screens/Logout";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 type AuthRoutesProps = {
   home: undefined;
@@ -23,7 +24,7 @@ type AuthRoutesProps = {
   createAd: undefined;
   editAd: undefined;
   detailsMyAds: undefined;
-  publishAd: undefined;
+  publishAd: ProductDTO;
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AuthRoutesProps>;

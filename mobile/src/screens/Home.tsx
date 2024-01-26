@@ -330,23 +330,23 @@ export function Home() {
           </Text>
           
           <CheckBoxPayment 
-            title="Boleto"
+            value="Boleto"
           />
 
           <CheckBoxPayment 
-            title="Pix"
+            value="Pix"
           />
 
           <CheckBoxPayment 
-            title="Dinheiro"
+            value="Dinheiro"
           />
 
           <CheckBoxPayment 
-            title="Cartão de Crédito"
+            value="Cartão de Crédito"
           />
 
           <CheckBoxPayment 
-            title="Depósito Bancário"
+            value="Depósito Bancário"
           />
 
           <Box 

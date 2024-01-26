@@ -1,6 +1,7 @@
 import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
+import { ProductDTO } from "@dtos/ProductDTO";
 import { useAuth } from "@hooks/useAuth";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { api } from "@services/api";
 import { Box, Button, Center, HStack, Pressable, Text, VStack, Image } from "native-base";
@@ -12,7 +13,12 @@ export function PublicAd() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
+  const { params } = useRoute();
 
+  const { accept_trade, price, name, payment_methods, is_new, imageProduct, description} = params as ProductDTO;
+
+  console.log(accept_trade, price, name, payment_methods, is_new, imageProduct, description);
+  
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
   }
