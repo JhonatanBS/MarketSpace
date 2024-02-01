@@ -1,19 +1,15 @@
 import { Box, VStack, Text, HStack } from "native-base";
 import { Bank, Barcode, CreditCard, Money, QrCode } from "phosphor-react-native";
 
-type OptionsOfPaymentProps = {
-  ticket: boolean;
-  pix: boolean;
-  bankDeposit: boolean;
-  money: boolean;
-  card: boolean;
+type MethodsPaymentProps = {
+  methods: string[];
 }
 
-export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: OptionsOfPaymentProps) {
+export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
   return(
     <VStack flex={1}>
 
-      { ticket ? 
+      { methods.includes("Boleto") ? 
         <HStack
         width="full"
         h="18px"
@@ -34,7 +30,7 @@ export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: O
         <></>
       }
 
-      { pix ? 
+      { methods.includes("Pix") ? 
         <HStack
         width="full"
         h="18px"
@@ -55,7 +51,7 @@ export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: O
         <></>
       }
 
-      { money ? 
+      { methods.includes("Dinheiro") ? 
         <HStack
         width="full"
         h="18px"
@@ -76,7 +72,7 @@ export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: O
         <></>
       }
 
-      { card ? 
+      { methods.includes("Cartão de Crédito") ? 
         <HStack
         width="full"
         h="18px"
@@ -97,7 +93,7 @@ export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: O
         <></>
       }
 
-      { bankDeposit ? 
+      { methods.includes("Depósito Bancário") ? 
         <HStack
         width="full"
         h="18px"
@@ -111,7 +107,7 @@ export function IconOptionsOfPayment({ ticket, bankDeposit, card, money, pix}: O
           color="gray.200"
           ml="8px"
         >
-          Boleto
+          Depósito Bancário
         </Text>
       </HStack>
       :

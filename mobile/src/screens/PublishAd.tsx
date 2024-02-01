@@ -1,20 +1,23 @@
-import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
+import { Dimensions } from "react-native";
+
 import { ProductDTO } from "@dtos/ProductDTO";
+
+import { api } from "@services/api";
+
 import { useAuth } from "@hooks/useAuth";
+
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { api } from "@services/api";
-import { Box, Button, Center, HStack, Pressable, Text, VStack, Image } from "native-base";
+
+import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
+
+import { Box, Button, Center, HStack, Pressable, Text, VStack, Image, ScrollView } from "native-base";
 import { ArrowLeft, Tag, User } from "phosphor-react-native";
-import { useState } from "react";
-import { Dimensions } from "react-native";
 
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
-
-
-import Carousel, { Pagination } from 'react-native-snap-carousel';
+import Carousel from 'react-native-snap-carousel';
 
 export function PublicAd() {
 
@@ -23,9 +26,14 @@ export function PublicAd() {
   const { user } = useAuth();
   const { params } = useRoute();
 
-  const { accept_trade, price, name, payment_methods, is_new, imageProduct, description } = params as ProductDTO;
-
-  console.log(payment_methods );
+  const { 
+    accept_trade, 
+    price, name, 
+    payment_methods, 
+    is_new, 
+    imageProduct, 
+    description 
+  } = params as ProductDTO;
 
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
@@ -60,8 +68,6 @@ export function PublicAd() {
         </Text>
       </Center>
 
-
-
       <Carousel
         layout="default"
         data={imageProduct}
@@ -82,8 +88,6 @@ export function PublicAd() {
               resizeMode="cover"
             />
           </Box>
-            
-           
         )}
       />
 
@@ -91,7 +95,6 @@ export function PublicAd() {
         px="24px"
         mt="22px"
         flex={1}
-        bg="amber.100"
       >
         <HStack mb="24px">
 
@@ -212,13 +215,11 @@ export function PublicAd() {
           Meios de pagamento:
         </Text>
 
-        <IconOptionsOfPayment
-          ticket
-          bankDeposit
-          card={false}
-          money={false}
-          pix
-        />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <IconOptionsOfPayment
+            methods={payment_methods[0]}
+          />
+        </ScrollView>
       </Box>
 
       <Box
