@@ -7,18 +7,26 @@ import { api } from "@services/api";
 import { Box, Button, Center, HStack, Pressable, Text, VStack, Image } from "native-base";
 import { ArrowLeft, Tag, User } from "phosphor-react-native";
 import { useState } from "react";
+import { Dimensions } from "react-native";
+
+const SLIDER_WIDTH = Dimensions.get("window").width;
+const ITEM_WIDTH = SLIDER_WIDTH;
+
+
+
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 
 export function PublicAd() {
-  
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
   const { params } = useRoute();
 
-  const { accept_trade, price, name, payment_methods, is_new, imageProduct, description} = params as ProductDTO;
+  const { accept_trade, price, name, payment_methods, is_new, imageProduct, description } = params as ProductDTO;
 
-  console.log(accept_trade, price, name, payment_methods, is_new, imageProduct, description);
-  
+  console.log(payment_methods );
+
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
   }
@@ -52,20 +60,41 @@ export function PublicAd() {
         </Text>
       </Center>
 
-      <Box
-        h="280px"
-        w="full"
-        bg="gray.400"
-      >
-      </Box>
+
+
+      <Carousel
+        layout="default"
+        data={imageProduct}
+        keyExtractor={(item) => item}
+        sliderWidth={SLIDER_WIDTH}
+        itemWidth={ITEM_WIDTH}
+        useScrollView
+        renderItem={({ item, index }) => (
+          <Box
+            flex={1}
+            key={index}
+          >
+            <Image
+              source={{ uri: item }}
+              alt="Imagens do produto"
+              w="full"
+              h="full"
+              resizeMode="cover"
+            />
+          </Box>
+            
+           
+        )}
+      />
 
       <Box
         px="24px"
         mt="22px"
         flex={1}
+        bg="amber.100"
       >
         <HStack mb="24px">
-          
+
           <Pressable
             h="24px"
             w="24px"
@@ -76,16 +105,16 @@ export function PublicAd() {
             alignItems="center"
           >
 
-           { user.avatar ?
-             <Image 
-             src={`${api.defaults.baseURL}/images/${user.avatar}`}
-             h="full"
-             w="full"
-             rounded="full"
-             alt="Foto do perfil"
-           />
-           :
-           <User size={20} color="#647AC7" />}
+            {user.avatar ?
+              <Image
+                src={`${api.defaults.baseURL}/images/${user.avatar}`}
+                h="full"
+                w="full"
+                rounded="full"
+                alt="Foto do perfil"
+              />
+              :
+              <User size={20} color="#647AC7" />}
           </Pressable>
 
           <Text
@@ -94,7 +123,7 @@ export function PublicAd() {
             fontSize="sm"
             ml="8px"
           >
-           {user.name}
+            {user.name}
           </Text>
         </HStack>
 
@@ -102,17 +131,18 @@ export function PublicAd() {
           h="17px"
           w="50px"
           borderRadius="full"
-          bg="gray.500"
+          bg={is_new ? "blue.400" : "gray.500"}
           borderWidth={0}
           alignItems="center"
         >
           <Text
-            color="gray.200"
+            color={is_new ? "gray.700" : "gray.200"}
             fontFamily="heading"
             fontSize="10px"
             textTransform="uppercase"
           >
-            Usado
+            {is_new ? "Novo" : "Usado"}
+
           </Text>
         </Center>
 
@@ -126,7 +156,7 @@ export function PublicAd() {
             fontFamily="heading"
             fontSize="lg"
           >
-            Luminária pendente
+            {name}
           </Text>
 
           <Text
@@ -139,7 +169,7 @@ export function PublicAd() {
               fontFamily="heading"
               fontSize="lg"
             >
-              {" 45,00"}
+              {price}
             </Text>
           </Text>
         </HStack>
@@ -149,7 +179,7 @@ export function PublicAd() {
           fontFamily="body"
           fontSize="sm"
         >
-          Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus.
+          {description}
         </Text>
 
         <HStack
@@ -169,7 +199,7 @@ export function PublicAd() {
             fontFamily="body"
             fontSize="sm"
           >
-            Não
+            {accept_trade ? "Sim" : "Não"}
           </Text>
         </HStack>
 
@@ -220,7 +250,7 @@ export function PublicAd() {
             color: "gray.200",
             marginLeft: "8px"
           }}
-        onPress={handleNewNavigationEditAd}
+          onPress={handleNewNavigationEditAd}
         >
           Voltar e editar
         </Button>

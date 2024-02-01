@@ -42,6 +42,7 @@ export function CreateAd() {
   const [accepetedExchange, setAccepetedExchange] = useState(false);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
 
+  console.log(addImageProduct)
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
       title: "Boleto",
@@ -248,6 +249,7 @@ export function CreateAd() {
                   w="full"
                   rounded={6}
                   position="absolute"
+                  key={index}
                 />
 
                 <Pressable
