@@ -9,7 +9,7 @@ export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
   return(
     <VStack flex={1}>
 
-      { methods.includes("Boleto") ? 
+      { methods.includes("boleto") ? 
         <HStack
         width="full"
         h="18px"
@@ -30,7 +30,7 @@ export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
         <></>
       }
 
-      { methods.includes("Pix") ? 
+      { methods.includes("pix") ? 
         <HStack
         width="full"
         h="18px"
@@ -51,7 +51,7 @@ export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
         <></>
       }
 
-      { methods.includes("Dinheiro") ? 
+      { methods.includes("cash") ? 
         <HStack
         width="full"
         h="18px"
@@ -72,7 +72,7 @@ export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
         <></>
       }
 
-      { methods.includes("Cartão de Crédito") ? 
+      { methods.includes("card") ? 
         <HStack
         width="full"
         h="18px"
@@ -93,7 +93,7 @@ export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
         <></>
       }
 
-      { methods.includes("Depósito Bancário") ? 
+      { methods.includes("deposit") ? 
         <HStack
         width="full"
         h="18px"

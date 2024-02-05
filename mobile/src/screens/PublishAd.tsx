@@ -11,13 +11,14 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
 
-import { Box, Button, Center, HStack, Pressable, Text, VStack, Image, ScrollView } from "native-base";
+import { Box, Button, Center, HStack, Pressable, Text, VStack, Image, ScrollView, useToast } from "native-base";
 import { ArrowLeft, Tag, User } from "phosphor-react-native";
 
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
 import Carousel from 'react-native-snap-carousel';
+import { AppError } from "@utils/AppError";
 
 export function PublicAd() {
 
@@ -26,15 +27,18 @@ export function PublicAd() {
   const { user } = useAuth();
   const { params } = useRoute();
 
+  const toast = useToast();
+
   const {
     accept_trade,
     price,
     name,
     payment_methods,
     is_new,
-    imageProduct,
+    imageProduct, 
     description
   } = params as ProductDTO;
+
 
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
@@ -42,6 +46,36 @@ export function PublicAd() {
 
   function handleNewNavigationEditAd() {
     navigation.navigate("createAd");
+  }
+
+  async function createAd() {
+    try {
+      await api.post("/products", {
+        name,
+        description,
+        is_new,
+        price,
+        accept_trade,
+        payment_methods: payment_methods[0]
+      });
+
+      toast.show({
+      title: "Produto cadastrado com sucesso",
+      placement: "top",
+      bgColor: "green.500"
+      });
+
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError ? error.message : "Não foi possível avançar. Tente novamente mais tarde";
+    
+      toast.show({
+        title,
+        placement: "top",
+        bgColor: "red.400"
+      });
+    }
   }
 
   return (
@@ -173,7 +207,7 @@ export function PublicAd() {
               fontFamily="heading"
               fontSize="lg"
             >
-              {price}
+              {price.toFixed(2)}
             </Text>
           </Text>
         </HStack>
@@ -277,7 +311,7 @@ export function PublicAd() {
             color: "gray.700",
             marginLeft: "8px"
           }}
-          onPress={handleNewNavigationMyAds}
+          onPress={() => {handleNewNavigationMyAds(), createAd()}}
         >
           Publicar
         </Button>

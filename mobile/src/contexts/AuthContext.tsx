@@ -57,7 +57,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-
   async function signOut() {
     try {
       setIsLoadingUserStorageData(true);

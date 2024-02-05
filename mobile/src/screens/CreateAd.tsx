@@ -29,6 +29,7 @@ type FormDataProps = {
 type methodsPaymentProps = {
   title: string;
   isCheck: boolean;
+  type: string;
 }
 
 const signInSchema = yup.object({
@@ -46,23 +47,28 @@ export function CreateAd() {
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
       title: "Boleto",
-      isCheck: false
+      isCheck: false,
+      type: "boleto"
     },
     {
       title: "Pix",
-      isCheck: false
+      isCheck: false,
+      type: "pix"
     },
     {
       title: "Dinheiro",
-      isCheck: false
+      isCheck: false,
+      type: "cash"
     },
     {
       title: "Cartão de Crédito",
-      isCheck: false
+      isCheck: false,
+      type: "card"
     },
     {
       title: "Depósito Bancário",
-      isCheck: false
+      isCheck: false,
+      type: "deposit"
     },
   ]);
 
@@ -112,7 +118,7 @@ export function CreateAd() {
         imageProduct: addImageProduct,
         name: title,
         description,
-        price,
+        price: parseFloat(price.replace(",", ".")),
         is_new: newProduct,
         accept_trade: accepetedExchange,
         payment_methods: [methodsPayment]
@@ -168,10 +174,10 @@ export function CreateAd() {
     setAddImageProduct(imageFilter);
   }
 
-  function handleIsCheckInMethodsPayment(title: string) {
+  function handleIsCheckInMethodsPayment(title: string, type: string) {
     const updateMethodPayment = allMethodsPayment.map((data) => {
       data.title === title ? 
-        (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, title]) : handleRemoveMethodsPayment(title))
+        (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, type]) : handleRemoveMethodsPayment(type))
         : 
          data.isCheck
           return data;
@@ -438,7 +444,7 @@ export function CreateAd() {
             title={data.title}
             type={data.isCheck}
             key={index}
-            onPress={ () =>  handleIsCheckInMethodsPayment(data.title)}
+            onPress={ () =>  handleIsCheckInMethodsPayment(data.title, data.type)}
           />
         ))}
       </VStack>
