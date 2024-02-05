@@ -26,13 +26,14 @@ export function PublicAd() {
   const { user } = useAuth();
   const { params } = useRoute();
 
-  const { 
-    accept_trade, 
-    price, name, 
-    payment_methods, 
-    is_new, 
-    imageProduct, 
-    description 
+  const {
+    accept_trade,
+    price,
+    name,
+    payment_methods,
+    is_new,
+    imageProduct,
+    description
   } = params as ProductDTO;
 
   function handleNewNavigationMyAds() {
@@ -40,7 +41,7 @@ export function PublicAd() {
   }
 
   function handleNewNavigationEditAd() {
-    navigation.navigate("editAd")
+    navigation.navigate("createAd");
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Ad } from "@components/Ad";
 
@@ -14,6 +14,18 @@ import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
+import { ProductDTO } from "@dtos/ProductDTO";
+
+type FormDataProps = {
+  title: string;
+  description: string;
+  price: string;
+}
+
+type methodsPaymentProps = {
+  title: string;
+  isCheck: boolean;
+}
 
 export function Home() {
   const [showModal, setShowModal] = useState(false);
@@ -21,7 +33,32 @@ export function Home() {
   const [ newObject, setNewObject ] = useState(false);
   const [ usedObject, setUsedObject ] = useState(false);
   const [ accepetedExchange, setAccepetedExchange ] = useState(false);
-  
+  const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
+
+
+  const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
+    {
+      title: "Boleto",
+      isCheck: false
+    },
+    {
+      title: "Pix",
+      isCheck: false
+    },
+    {
+      title: "Dinheiro",
+      isCheck: false
+    },
+    {
+      title: "Cartão de Crédito",
+      isCheck: false
+    },
+    {
+      title: "Depósito Bancário",
+      isCheck: false
+    },
+  ]);
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
@@ -34,8 +71,26 @@ export function Home() {
     navigation.navigate("myAds");
   }
 
+  function handleIsCheckInMethodsPayment(title: string) {
+    const updateMethodPayment = allMethodsPayment.map((data) => {
+      data.title === title ? 
+        (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, title]) : handleRemoveMethodsPayment(title))
+        : 
+         data.isCheck
+          return data;
+    }
+    );
+
+    setAllMethodsPayment(updateMethodPayment);
+  }
+
+  function handleRemoveMethodsPayment(method: string) {
+    const removeMethodPayment = methodsPayment.filter((titleMethod) => titleMethod !== method);
+    setMethodsPayment(removeMethodPayment);
+  }
+
   return(
-    <>
+    
     <VStack flex={1} px="24px">
       <HStack w="full" h="45px" mt={20} justifyContent="space-between">
         
@@ -61,12 +116,12 @@ export function Home() {
             <User size={30} color="#647AC7"/>
             } 
           </Pressable>
-          <View ml="10px">
+          <Box ml="10px">
             <Text color="gray.100" fontFamily="body">
               Boas vindas,
             </Text>
             <Text fontFamily="heading">{user.name}!</Text> 
-          </View>
+          </Box>
         </Box>
 
         <Button
@@ -117,13 +172,13 @@ export function Home() {
         pr="20px"
         
       >
-        <View flexDirection="row" alignItems="center">
+        <Box flexDirection="row" alignItems="center">
           <Tag 
             size={22} 
             color="#364D9D"
           />
 
-          <View flexDirection="column" ml="16px">
+          <Box flexDirection="column" ml="16px">
             <Text
               fontFamily="heading"
               fontSize="lg"
@@ -140,8 +195,8 @@ export function Home() {
             >
               anúncios ativos
             </Text>
-          </View>
-        </View>
+          </Box>
+        </Box>
 
         <Button
           onPress={newNavigationMyAds}
@@ -240,8 +295,8 @@ export function Home() {
       visible={showModal}
       statusBarTranslucent
     >
-      <View flex={1} backgroundColor= {"rgba(0, 0, 0, 0.5)"} justifyContent="flex-end">
-        <View 
+      <Box flex={1} backgroundColor= {"rgba(0, 0, 0, 0.5)"} justifyContent="flex-end">
+        <Box 
           bg="gray.700" 
           h="600px"
           borderTopRadius={24}
@@ -329,25 +384,14 @@ export function Home() {
             Meios de pagamento aceitos
           </Text>
           
-          <CheckBoxPayment 
-            //value="Boleto"
+          {allMethodsPayment.map((data,index) => (
+          <CheckBoxPayment
+            title={data.title}
+            type={data.isCheck}
+            key={index}
+            onPress={ () =>  handleIsCheckInMethodsPayment(data.title)}
           />
-
-          <CheckBoxPayment 
-            //value="Pix"
-          />
-
-          <CheckBoxPayment 
-            //value="Dinheiro"
-          />
-
-          <CheckBoxPayment 
-            //value="Cartão de Crédito"
-          />
-
-          <CheckBoxPayment 
-            //value="Depósito Bancário"
-          />
+        ))}
 
           <Box 
             flexDirection="row" 
@@ -389,11 +433,11 @@ export function Home() {
               Aplicar filtros
             </Button>
           </Box>
-        </View>    
-      </View> 
+        </Box>    
+      </Box> 
       </Modal>
     </VStack>
 
-    </>
+    
   )
   }

@@ -22,7 +22,7 @@ type AuthRoutesProps = {
   myAds: undefined;
   logout: undefined;
   createAd: undefined;
-  editAd: undefined;
+  editAd: ProductDTO;
   detailsMyAds: undefined;
   publishAd: ProductDTO;
 }

@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,6 +18,7 @@ import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { AppError } from "@utils/AppError";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 type FormDataProps = {
   title: string;
@@ -42,7 +43,6 @@ export function CreateAd() {
   const [accepetedExchange, setAccepetedExchange] = useState(false);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
 
-  console.log(addImageProduct)
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
       title: "Boleto",
@@ -67,6 +67,25 @@ export function CreateAd() {
   ]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const { params } = useRoute();
+
+  /*const { 
+    accept_trade, 
+    price, 
+    name, 
+    payment_methods, 
+    is_new, 
+    imageProduct, 
+    description 
+  } = params as ProductDTO;
+
+  if(accept_trade && price && name && payment_methods && is_new && imageProduct && description ) {
+    setAddImageProduct(imageProduct);
+    setNewProduct(is_new);
+    setAccepetedExchange(accept_trade);
+    setMethodsPayment(payment_methods[0]);
+  }*/
 
   const toast = useToast();
 
@@ -256,6 +275,7 @@ export function CreateAd() {
                   mr="4px"
                   mt="4px"
                   rounded="full"
+                  key={index}
                   onPress={() => handlePhotoDeleteAd(item)}
                 >
                   <XCircle size={16} weight="fill" color="#3E3A40" />
@@ -413,10 +433,11 @@ export function CreateAd() {
           Meios de pagamento aceitos
         </Text>
 
-        {allMethodsPayment.map((data) => (
+        {allMethodsPayment.map((data,index) => (
           <CheckBoxPayment
             title={data.title}
             type={data.isCheck}
+            key={index}
             onPress={ () =>  handleIsCheckInMethodsPayment(data.title)}
           />
         ))}
