@@ -27,6 +27,7 @@ type FormDataProps = {
 }
 
 type methodsPaymentProps = {
+  id: number,
   title: string;
   isCheck: boolean;
   type: string;
@@ -46,26 +47,31 @@ export function CreateAd() {
 
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
+      id: 1,
       title: "Boleto",
       isCheck: false,
       type: "boleto"
     },
     {
+      id: 2,
       title: "Pix",
       isCheck: false,
       type: "pix"
     },
     {
+      id: 3,
       title: "Dinheiro",
       isCheck: false,
       type: "cash"
     },
     {
+      id: 4,
       title: "Cartão de Crédito",
       isCheck: false,
       type: "card"
     },
     {
+      id: 5,
       title: "Depósito Bancário",
       isCheck: false,
       type: "deposit"
@@ -274,14 +280,12 @@ export function CreateAd() {
                   w="full"
                   rounded={6}
                   position="absolute"
-                  key={index}
                 />
 
                 <Pressable
                   mr="4px"
                   mt="4px"
                   rounded="full"
-                  key={index}
                   onPress={() => handlePhotoDeleteAd(item)}
                 >
                   <XCircle size={16} weight="fill" color="#3E3A40" />
@@ -439,11 +443,11 @@ export function CreateAd() {
           Meios de pagamento aceitos
         </Text>
 
-        {allMethodsPayment.map((data,index) => (
+        {allMethodsPayment.map((data) => (
           <CheckBoxPayment
             title={data.title}
             type={data.isCheck}
-            key={index}
+            key={data.id}
             onPress={ () =>  handleIsCheckInMethodsPayment(data.title, data.type)}
           />
         ))}

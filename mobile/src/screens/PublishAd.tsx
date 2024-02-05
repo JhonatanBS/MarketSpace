@@ -37,8 +37,9 @@ export function PublicAd() {
     is_new,
     imageProduct, 
     description
-  } = params as ProductDTO;
+  } = params as ProductDTO; 
 
+  console.log(imageProduct);
 
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds")
@@ -50,13 +51,38 @@ export function PublicAd() {
 
   async function createAd() {
     try {
-      await api.post("/products", {
+
+     const { data } = await api.post("/products", {
         name,
         description,
         is_new,
         price,
         accept_trade,
         payment_methods: payment_methods[0]
+      });
+
+      const uploadImagesProduct = new FormData();
+
+      const uploadAllFile = imageProduct.map((file, index) => {
+        let fileExtension = file.split(".").pop();
+
+        let photoFile = {
+          name: `${data.name}.${fileExtension}`,
+          uri: file,
+          type: `image/${fileExtension}`
+        } as any;
+
+        uploadImagesProduct.append("images", photoFile);
+
+        return file;
+      });
+
+      uploadImagesProduct.append("product_id", data.id);
+
+      await api.post("/products/images", uploadImagesProduct, {
+        headers: {
+          "Content-Type": "multipart/form-data" 
+        }
       });
 
       toast.show({

@@ -6,13 +6,14 @@ type PropsCheckBox = IPressableProps & {
   title: string;
 }
 
-export function CheckBoxPayment({ type, title, ...rest }: PropsCheckBox) {
+export function CheckBoxPayment({ type, title, id, ...rest }: PropsCheckBox) {
   return (
     <Box 
       h="18px" 
       w="full"
       flexDirection="row"
       mb="14px"
+      key={id}
     >
       <Pressable
         h="18px"
