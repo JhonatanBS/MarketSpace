@@ -8,6 +8,7 @@ export type AdProps = IPressableProps & {
   product_images: ProductImageProps[];
   is_new: boolean;
   user_id?: string;
+  user?: AvatarProps;
 }
 
 type ProductImageProps = {
@@ -15,9 +16,13 @@ type ProductImageProps = {
   path?: string;
 }
 
-export function Ad({ name, price, product_images, is_new, user_id, ...rest }: AdProps) {
+type AvatarProps = {
+  avatar: string;
+}
 
-  const { user } = useAuth();
+export function Ad({ name, price, product_images, is_new, user_id, user, ...rest }: AdProps) {
+
+  const { id } = useAuth().user;
 
   return (
     <Pressable
@@ -31,7 +36,6 @@ export function Ad({ name, price, product_images, is_new, user_id, ...rest }: Ad
         borderRadius={6}
         w="full"
         h="100px"
-
       >
         <Image
           h="full"
@@ -42,7 +46,7 @@ export function Ad({ name, price, product_images, is_new, user_id, ...rest }: Ad
           source={{ uri: `${api.defaults.baseURL}/images/${product_images[0].path}` }}
         />
 
-        {user.id === user_id ?
+        { id === user_id ?
           <></>
           :
           <Box
@@ -61,7 +65,7 @@ export function Ad({ name, price, product_images, is_new, user_id, ...rest }: Ad
               width="full"
               alt="Foto do perfil"
               borderRadius={50}
-              source={{ uri: `${api.defaults.baseURL}/images/${user.avatar}` }}
+              source={{ uri: `${api.defaults.baseURL}/images/${user?.avatar}` }}
             />
           </Box>
         }

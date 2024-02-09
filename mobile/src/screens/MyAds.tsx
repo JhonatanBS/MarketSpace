@@ -39,9 +39,12 @@ export function MyAds() {
       setIsLoading(true);
       const { data } = await api.get(`/users/products`);
 
+      if(!data) {
+        return;
+      }
+
       setAllMyProducts(data);
 
-      console.log("AD => ", allMyProducts);
     } catch (error) {
       throw error;
     } finally {

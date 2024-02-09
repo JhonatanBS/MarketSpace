@@ -39,10 +39,8 @@ export function PublicAd() {
     description
   } = params as ProductDTO; 
 
-  console.log(imageProduct);
-
   function handleNewNavigationMyAds() {
-    navigation.navigate("myAds")
+    navigation.navigate("home");
   }
 
   function handleNewNavigationEditAd() {

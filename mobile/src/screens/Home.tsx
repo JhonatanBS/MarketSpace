@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
-import { Ad } from "@components/Ad";
+import { Ad, AdProps } from "@components/Ad";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
@@ -52,6 +52,9 @@ export function Home() {
   ]);
 
   const [counterProducts, setCounterProducts] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [allMyProducts, setAllMyProducts] = useState<AdProps[]>([]);
+
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -93,8 +96,24 @@ export function Home() {
     }
   }
 
+  async function handleGetAllProductsOfUsers() {
+    try {
+      setIsLoading(true);
+      const { data } = await api.get(`/products`);
+
+      setAllMyProducts(data);
+
+      console.log("AD => ", allMyProducts);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   useFocusEffect(useCallback(() => {
     handleCounterAllMyProducts();
+    handleGetAllProductsOfUsers();
   }, []));
 
   return (
@@ -285,7 +304,18 @@ export function Home() {
           flexWrap="wrap"
           justifyContent="space-between"
         >
-          {""}
+          {allMyProducts.map((product, index) => (
+              <Ad
+                name={product.name}
+                price={product.price}
+                is_new={product.is_new}
+                product_images={product.product_images}
+                user_id={product.user_id}
+                user={product.user}
+                key={index}
+              />
+            ))
+            }
         </Box>
       </ScrollView>
 
