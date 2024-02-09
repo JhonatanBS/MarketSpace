@@ -1,13 +1,28 @@
-import { Ad } from "@components/Ad";
-import { useNavigation } from "@react-navigation/native";
-import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { useState, useCallback } from "react";
+
 import { Box, Pressable, ScrollView, Text, View } from "native-base";
+
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+
+import { Ad, AdProps } from "@components/Ad";
+import { Loading } from "@components/Loading";
+
+import { useAuth } from "@hooks/useAuth";
+
+import { api } from "@services/api";
+
 import { CaretDown, CaretUp, Plus } from "phosphor-react-native";
-import { useState } from "react";
 
 export function MyAds() {
-  const [ chooseFilter, setChooseFilter ] = useState("Todos");
-  const [ buttonFilter, setButtonFilter] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chooseFilter, setChooseFilter] = useState("Todos");
+  const [buttonFilter, setButtonFilter] = useState(false);
+
+  const [allMyProducts, setAllMyProducts] = useState<AdProps[]>([]);
+
+  const { user } = useAuth();
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -18,14 +33,33 @@ export function MyAds() {
   function handleNewNavigationDetailsMyAds() {
     navigation.navigate("detailsMyAds");
   }
-  
-  return(
-    <Box 
-      flex={1} 
+
+  async function handleGetAllMyProducts() {
+    try {
+      setIsLoading(true);
+      const { data } = await api.get(`/users/products`);
+
+      setAllMyProducts(data);
+
+      console.log("AD => ", allMyProducts);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(useCallback(() => {
+    handleGetAllMyProducts();
+  }, []));
+
+  return (
+    <Box
+      flex={1}
       px="24px"
       pt="64px"
     >
-      <Box 
+      <Box
         w="full"
         h="26px"
         mb="32px"
@@ -44,14 +78,14 @@ export function MyAds() {
           top={0.55}
           onPress={handleNewNavigationCreateAd}
         >
-          <Plus 
-            size={24} 
+          <Plus
+            size={24}
             color="#1A181B"
           />
         </Pressable>
       </Box>
 
-      <View 
+      <View
         w="full"
         h="34px"
         mb="24px"
@@ -63,9 +97,9 @@ export function MyAds() {
           fontFamily="body"
           fontSize="sm"
         >
-          { 9 } anúncios
+          {`${allMyProducts.length} `} anúncios
         </Text>
-        
+
         <Pressable
           h="34px"
           w="111px"
@@ -87,13 +121,13 @@ export function MyAds() {
             {chooseFilter}
           </Text>
 
-          { buttonFilter ? 
-            <CaretUp size={16} color="#5F5B62"/>
+          {buttonFilter ?
+            <CaretUp size={16} color="#5F5B62" />
             :
-            <CaretDown size={16} color="#5F5B62"/>
+            <CaretDown size={16} color="#5F5B62" />
           }
-          
-          { buttonFilter ?
+
+          {buttonFilter ?
             <Box
               h="102px"
               w="111px"
@@ -106,7 +140,7 @@ export function MyAds() {
             >
 
               <Pressable
-                onPress={() => {setChooseFilter("Todos"), setButtonFilter(!buttonFilter)}}
+                onPress={() => { setChooseFilter("Todos"), setButtonFilter(!buttonFilter) }}
               >
                 <Text
                   fontFamily="heading"
@@ -117,9 +151,9 @@ export function MyAds() {
                 </Text>
               </Pressable>
 
-              <Pressable 
+              <Pressable
                 my="10px"
-                onPress={() => {setChooseFilter("Ativos"), setButtonFilter(!buttonFilter)}}
+                onPress={() => { setChooseFilter("Ativos"), setButtonFilter(!buttonFilter) }}
               >
                 <Text
                   fontFamily="body"
@@ -130,8 +164,8 @@ export function MyAds() {
                 </Text>
               </Pressable>
 
-              <Pressable 
-                onPress={() => {setChooseFilter("Inativos"), setButtonFilter(!buttonFilter)}}
+              <Pressable
+                onPress={() => { setChooseFilter("Inativos"), setButtonFilter(!buttonFilter) }}
               >
                 <Text
                   fontFamily="body"
@@ -143,42 +177,37 @@ export function MyAds() {
               </Pressable>
 
             </Box>
-          : 
+            :
             <></>
-        } 
+          }
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} zIndex={-1}>
-        <Box 
-          w="full" 
-          h="full" 
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="space-between"
-        >
-          <Ad 
-            onPress={handleNewNavigationDetailsMyAds}
-          />
 
-          <Ad 
-            onPress={handleNewNavigationDetailsMyAds}
-          />
-
-          <Ad 
-            onPress={handleNewNavigationDetailsMyAds}
-          />
-
-          <Ad 
-            onPress={handleNewNavigationDetailsMyAds}
-          />
-
-          <Ad 
-            onPress={handleNewNavigationDetailsMyAds}
-          />
-          
-        </Box>
-      </ScrollView>
+      {isLoading ?
+        <Loading />
+        :
+        <ScrollView showsVerticalScrollIndicator={false} zIndex={-1}>
+          <Box
+            w="full"
+            h="full"
+            flexDirection="row"
+            flexWrap="wrap"
+            justifyContent="space-between"
+          >
+            {allMyProducts.map((product, index) => (
+              <Ad
+                name={product.name}
+                price={product.price}
+                is_new={product.is_new}
+                product_images={product.product_images}
+                user_id={product.user_id}
+                key={index}
+              />
+            ))
+            }
+          </Box>
+        </ScrollView>}
 
     </Box>
   )

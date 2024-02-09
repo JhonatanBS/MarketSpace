@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import { Ad } from "@components/Ad";
 
@@ -14,13 +14,6 @@ import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
-import { ProductDTO } from "@dtos/ProductDTO";
-
-type FormDataProps = {
-  title: string;
-  description: string;
-  price: string;
-}
 
 type methodsPaymentProps = {
   title: string;
@@ -30,11 +23,10 @@ type methodsPaymentProps = {
 export function Home() {
   const [showModal, setShowModal] = useState(false);
 
-  const [ newObject, setNewObject ] = useState(false);
-  const [ usedObject, setUsedObject ] = useState(false);
-  const [ accepetedExchange, setAccepetedExchange ] = useState(false);
+  const [newObject, setNewObject] = useState(false);
+  const [usedObject, setUsedObject] = useState(false);
+  const [accepetedExchange, setAccepetedExchange] = useState(false);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
-
 
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
@@ -59,6 +51,8 @@ export function Home() {
     },
   ]);
 
+  const [counterProducts, setCounterProducts] = useState(0);
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { user } = useAuth();
@@ -73,11 +67,11 @@ export function Home() {
 
   function handleIsCheckInMethodsPayment(title: string) {
     const updateMethodPayment = allMethodsPayment.map((data) => {
-      data.title === title ? 
+      data.title === title ?
         (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, title]) : handleRemoveMethodsPayment(title))
-        : 
-         data.isCheck
-          return data;
+        :
+        data.isCheck
+      return data;
     }
     );
 
@@ -89,11 +83,25 @@ export function Home() {
     setMethodsPayment(removeMethodPayment);
   }
 
-  return(
-    
+  async function handleCounterAllMyProducts() {
+    try {
+      const { data } = await api.get(`/users/products`);
+
+      setCounterProducts(data.length);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  useFocusEffect(useCallback(() => {
+    handleCounterAllMyProducts();
+  }, []));
+
+  return (
+
     <VStack flex={1} px="24px">
       <HStack w="full" h="45px" mt={20} justifyContent="space-between">
-        
+
         <Box flexDirection="row">
           <Pressable
             h="45px"
@@ -104,23 +112,23 @@ export function Home() {
             justifyContent="center"
             alignItems="center"
           >
-            { user.avatar ?
-            <Image 
-              src={`${api.defaults.baseURL}/images/${user.avatar}`}
-              h="full"
-              w="full"
-              rounded="full"
-              alt="Foto do perfil"
-            />
-            :
-            <User size={30} color="#647AC7"/>
-            } 
+            {user.avatar ?
+              <Image
+                src={`${api.defaults.baseURL}/images/${user.avatar}`}
+                h="full"
+                w="full"
+                rounded="full"
+                alt="Foto do perfil"
+              />
+              :
+              <User size={30} color="#647AC7" />
+            }
           </Pressable>
           <Box ml="10px">
             <Text color="gray.100" fontFamily="body">
               Boas vindas,
             </Text>
-            <Text fontFamily="heading">{user.name}!</Text> 
+            <Text fontFamily="heading">{user.name}!</Text>
           </Box>
         </Box>
 
@@ -132,9 +140,9 @@ export function Home() {
           justifyContent="center"
           alignItems="center"
           startIcon={
-            <Plus 
-            size={16} 
-            color="#EDECEE"
+            <Plus
+              size={16}
+              color="#EDECEE"
             />}
           _pressed={{
             backgroundColor: "gray.300"
@@ -149,32 +157,32 @@ export function Home() {
         </Button>
       </HStack>
 
-      <Text 
+      <Text
         mt="33px"
         mb="12px"
         fontFamily="body"
         fontSize="sm"
         color="gray.300"
       >
-        Seus produtos anunciados para venda 
+        Seus produtos anunciados para venda
       </Text>
 
       <Box
         w="full"
         h="66px"
         bg={"#DFE1EA"}
-        
+
         borderRadius={6}
         flexDirection="row"
         alignItems="center"
         justifyContent="space-between"
         pl="16px"
         pr="20px"
-        
+
       >
         <Box flexDirection="row" alignItems="center">
-          <Tag 
-            size={22} 
+          <Tag
+            size={22}
             color="#364D9D"
           />
 
@@ -184,14 +192,13 @@ export function Home() {
               fontSize="lg"
               color="gray.200"
             >
-              4
+              {counterProducts}
             </Text>
 
             <Text
               fontFamily="body"
               fontSize="xs"
               color="gray.200"
-
             >
               anúncios ativos
             </Text>
@@ -207,8 +214,8 @@ export function Home() {
           justifyContent="center"
           alignItems="center"
           endIcon={
-            <ArrowRight 
-              size={16} 
+            <ArrowRight
+              size={16}
               color="#364D9D"
             />}
           _pressed={{
@@ -234,7 +241,7 @@ export function Home() {
         Compre produtos variados
       </Text>
 
-      <Input 
+      <Input
         mb="24px"
         w="full"
         h="45px"
@@ -252,192 +259,183 @@ export function Home() {
         }}
         placeholder="Buscar anúncio"
         InputRightElement={
-        <Box flexDirection="row" pr="16px">
-          <Pressable onPress={() => console.log("Ola mundo")}>
-            <MagnifyingGlass size={20} color="#3E3A40"/>
-          </Pressable>
+          <Box flexDirection="row" pr="16px">
+            <Pressable onPress={() => console.log("Ola mundo")}>
+              <MagnifyingGlass size={20} color="#3E3A40" />
+            </Pressable>
 
-          <Divider 
-            orientation="vertical" 
-            w={0.5} h={5} 
-            bg="gray.400"
-            mx="12px"
+            <Divider
+              orientation="vertical"
+              w={0.5} h={5}
+              bg="gray.400"
+              mx="12px"
             />
-          
-          <Pressable onPress={() => setShowModal(true)}>
-            <Sliders size={20} color="#3E3A40"/>
-          </Pressable>
-        </Box>}
+
+            <Pressable onPress={() => setShowModal(true)}>
+              <Sliders size={20} color="#3E3A40" />
+            </Pressable>
+          </Box>}
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Box 
-          w="full" 
-          h="full" 
+        <Box
+          w="full"
+          h="full"
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="space-between"
         >
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
-          <Ad />
+          {""}
         </Box>
       </ScrollView>
 
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={showModal}
-      statusBarTranslucent
-    >
-      <Box flex={1} backgroundColor= {"rgba(0, 0, 0, 0.5)"} justifyContent="flex-end">
-        <Box 
-          bg="gray.700" 
-          h="600px"
-          borderTopRadius={24}
-          px="24px"
-        >
-          <Box 
-            h="4px"
-            w="full"
-            alignItems="center"
-            mt="12px"
-            mb="32px"
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        statusBarTranslucent
+      >
+        <Box flex={1} backgroundColor={"rgba(0, 0, 0, 0.5)"} justifyContent="flex-end">
+          <Box
+            bg="gray.700"
+            h="600px"
+            borderTopRadius={24}
+            px="24px"
           >
-            <Divider 
+            <Box
               h="4px"
-              w="56px"
-              orientation="vertical"
-            />
-          </Box>
-          <Box 
-            flexDirection="row" 
-            w="full"
-            h="26px"
-            justifyContent="space-between"
-            alignItems="center"
-          >
+              w="full"
+              alignItems="center"
+              mt="12px"
+              mb="32px"
+            >
+              <Divider
+                h="4px"
+                w="56px"
+                orientation="vertical"
+              />
+            </Box>
+            <Box
+              flexDirection="row"
+              w="full"
+              h="26px"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Text
+                fontFamily="heading"
+                fontSize="lg"
+                color="gray.100"
+              >
+                Filtrar anúncios
+              </Text>
+
+              <Pressable onPress={() => setShowModal(false)}>
+                <X size={24} color="#9F9BA1" />
+              </Pressable>
+            </Box>
+
             <Text
               fontFamily="heading"
-              fontSize="lg"
-              color="gray.100"
+              fontSize="sm"
+              color="gray.200"
+              mt="24px"
+              mb="12px"
             >
-              Filtrar anúncios
+              Condição
             </Text>
-              
-            <Pressable onPress={() => setShowModal(false)}>
-              <X size={24} color="#9F9BA1"/>
-            </Pressable>
-          </Box>
 
-          <Text
-            fontFamily="heading"
-            fontSize="sm"
-            color="gray.200"
-            mt="24px"
-            mb="12px"
-          >
-            Condição
-          </Text>
-          
-          <HStack w="153px" h="28px" justifyContent="space-between">
-            <ButtonNewOrUsed 
-              title="Novo"
-              selected={newObject}
-              onPress={() => setNewObject(!newObject)}
+            <HStack w="153px" h="28px" justifyContent="space-between">
+              <ButtonNewOrUsed
+                title="Novo"
+                selected={newObject}
+                onPress={() => setNewObject(!newObject)}
+              />
+
+              <ButtonNewOrUsed
+                title="Usado"
+                selected={usedObject}
+                onPress={() => setUsedObject(!usedObject)}
+              />
+            </HStack>
+
+            <Text
+              fontFamily="heading"
+              fontSize="sm"
+              color="gray.200"
+              mt="24px"
+              mb="12px"
+            >
+              Aceita troca?
+            </Text>
+
+            <SwitchExchange
+              type={accepetedExchange}
+              onPress={() => setAccepetedExchange(!accepetedExchange)}
             />
 
-            <ButtonNewOrUsed 
-              title="Usado"
-              selected={usedObject}
-              onPress={() => setUsedObject(!usedObject)}
-            />
-          </HStack>
-
-          <Text
-            fontFamily="heading"
-            fontSize="sm"
-            color="gray.200"
-            mt="24px"
-            mb="12px"
-          >
-            Aceita troca?
-          </Text>
-
-         <SwitchExchange 
-           type={accepetedExchange}
-           onPress={() => setAccepetedExchange(!accepetedExchange)}
-         />
-
-          <Text
-            fontFamily="heading"
-            fontSize="sm"
-            color="gray.200"
-            mt="24px"
-            mb="12px"
-          >
-            Meios de pagamento aceitos
-          </Text>
-          
-          {allMethodsPayment.map((data,index) => (
-          <CheckBoxPayment
-            title={data.title}
-            type={data.isCheck}
-            key={index}
-            onPress={ () =>  handleIsCheckInMethodsPayment(data.title)}
-          />
-        ))}
-
-          <Box 
-            flexDirection="row" 
-            justifyContent="space-between"
-            mt="53px"
-          >
-            <Button
-              h="42px"
-              w="170px"
-              borderRadius={6}
-              bg="gray.500"
-              _text={{
-                fontFamily: "heading",
-                fontSize: "sm",
-                color: "gray.200"
-              }}
-              _pressed={{
-                backgroundColor: "gray.600"
-              }}
-
+            <Text
+              fontFamily="heading"
+              fontSize="sm"
+              color="gray.200"
+              mt="24px"
+              mb="12px"
             >
-              Resetar filtros
-            </Button>
+              Meios de pagamento aceitos
+            </Text>
 
-            <Button
-              h="42px"
-              w="170px"
-              borderRadius={6}
-              bg="gray.100"
-              _text={{
-                fontFamily: "heading",
-                fontSize: "sm",
-                color: "gray.700"
-              }}
-              _pressed={{
-                backgroundColor: "gray.200"
-              }}
+            {allMethodsPayment.map((data, index) => (
+              <CheckBoxPayment
+                title={data.title}
+                type={data.isCheck}
+                key={index}
+                onPress={() => handleIsCheckInMethodsPayment(data.title)}
+              />
+            ))}
+
+            <Box
+              flexDirection="row"
+              justifyContent="space-between"
+              mt="53px"
             >
-              Aplicar filtros
-            </Button>
+              <Button
+                h="42px"
+                w="170px"
+                borderRadius={6}
+                bg="gray.500"
+                _text={{
+                  fontFamily: "heading",
+                  fontSize: "sm",
+                  color: "gray.200"
+                }}
+                _pressed={{
+                  backgroundColor: "gray.600"
+                }}
+
+              >
+                Resetar filtros
+              </Button>
+
+              <Button
+                h="42px"
+                w="170px"
+                borderRadius={6}
+                bg="gray.100"
+                _text={{
+                  fontFamily: "heading",
+                  fontSize: "sm",
+                  color: "gray.700"
+                }}
+                _pressed={{
+                  backgroundColor: "gray.200"
+                }}
+              >
+                Aplicar filtros
+              </Button>
+            </Box>
           </Box>
-        </Box>    
-      </Box> 
+        </Box>
       </Modal>
     </VStack>
-
-    
   )
-  }
+}
