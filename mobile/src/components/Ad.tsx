@@ -3,6 +3,7 @@ import { api } from "@services/api";
 import { Box, Text, Image, Pressable, IPressableProps } from "native-base";
 
 export type AdProps = IPressableProps & {
+  id: string;
   name: string;
   price: number;
   product_images: ProductImageProps[];

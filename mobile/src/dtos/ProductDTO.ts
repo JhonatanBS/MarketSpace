@@ -1,5 +1,5 @@
 export type ProductDTO = {
-  imageProduct: string[]
+  product_images: string[];
   name: string;
   description: string;
   is_new: boolean,

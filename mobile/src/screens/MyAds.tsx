@@ -14,6 +14,7 @@ import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 
 import { CaretDown, CaretUp, Plus } from "phosphor-react-native";
+import { ProductDTO } from "@dtos/ProductDTO";
 
 export function MyAds() {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +31,9 @@ export function MyAds() {
     navigation.navigate("createAd");
   }
 
-  function handleNewNavigationDetailsMyAds() {
-    navigation.navigate("detailsMyAds");
+  function handleNewNavigationDetailsMyAds(id: string) {
+    console.log(id)
+    navigation.navigate("detailsMyAds", { id });
   }
 
   async function handleGetAllMyProducts() {
@@ -206,6 +208,8 @@ export function MyAds() {
                 product_images={product.product_images}
                 user_id={product.user_id}
                 key={index}
+                id={product.id}
+                onPress={() => handleNewNavigationDetailsMyAds(product.id)}
               />
             ))
             }

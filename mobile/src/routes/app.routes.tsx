@@ -16,6 +16,7 @@ import { PublicAd } from "@screens/PublishAd";
 import { useAuth } from "@hooks/useAuth";
 import { Logout } from "@screens/Logout";
 import { ProductDTO } from "@dtos/ProductDTO";
+import { IdDTO } from "@dtos/IdDTO";
 
 type AuthRoutesProps = {
   home: undefined;
@@ -23,7 +24,7 @@ type AuthRoutesProps = {
   logout: undefined;
   createAd: undefined;
   editAd: ProductDTO;
-  detailsMyAds: undefined;
+  detailsMyAds: IdDTO;
   publishAd: ProductDTO;
 }
 

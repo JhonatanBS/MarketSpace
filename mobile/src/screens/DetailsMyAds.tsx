@@ -1,25 +1,85 @@
 import { IconOptionsOfPayment } from "@components/IconOptionsOfPayment";
-import { useNavigation } from "@react-navigation/native";
+import { Loading } from "@components/Loading";
+import { DetailsProductDTO } from "@dtos/DetailsProductDTO";
+import { IdDTO } from "@dtos/IdDTO";
+import { useAuth } from "@hooks/useAuth";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { api } from "@services/api";
 
-import { Box, HStack, VStack, Pressable, View, Text, Center, Button } from "native-base";
+import { Box, HStack, VStack, Pressable, Image, Text, Center, Button, ScrollView } from "native-base";
 import { ArrowLeft, PencilSimpleLine, Power, TrashSimple, User } from "phosphor-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { Dimensions } from "react-native";
+import Carousel from "react-native-snap-carousel";
+
+const SLIDER_WIDTH = Dimensions.get("window").width;
+const ITEM_WIDTH = SLIDER_WIDTH;
 
 export function DetailsMyAds() {
+  const [ isLoading, setIsLoading] = useState(false);
+
+  const [ currentProduct, setCurrentProduct ] = useState<DetailsProductDTO>({} as DetailsProductDTO);
+  const [ methodsPayment, setMethodsPayment] = useState<string[]>([]);
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const { params } = useRoute();
+
+  const { id } = params as IdDTO;
+
+  const { user } = useAuth();
 
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds");
   }
 
   function handleNewNavigationEditMyAd() {
-    navigation.navigate("editAd");
+    //navigation.navigate("editAd");
+  }
+
+  async function handleMethodsPayment(data: DetailsProductDTO) {
+
+    const { payment_methods } = data;
+    
+    const newMethodsPayment = payment_methods.map(( item, index) => {
+      return item.key;
+    });
+
+    return newMethodsPayment;
+  }
+
+  async function handleGetOneProduct() {
+    try {
+      
+      setIsLoading(true);
+      const { data } = await api.get(`/products/${id}`);
+     
+      setCurrentProduct(data);
+     
+      const allMethodsPayment = await handleMethodsPayment(data);
+
+      setMethodsPayment(allMethodsPayment);
+
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useFocusEffect(useCallback(() => {
+    handleGetOneProduct();
+  }, [id]));
+
+  if(isLoading) { 
+    return <Loading />
   }
 
   return (
-    <VStack flex={1} safeArea mt="35px">
+    <VStack flex={1} safeArea mt="10px">
       <Box
-        h="24px"
+        h="24px" 
         w="full"
         px="24px"
         mb="12px"
@@ -35,17 +95,33 @@ export function DetailsMyAds() {
         </Pressable>
       </Box>
 
-      <Box
-        h="280px"
-        w="full"
-        bg="gray.400"
-      >
-      </Box>
+      <Carousel
+        layout="default"
+        data={currentProduct.product_images}
+        keyExtractor={(item) => item.id}
+        sliderWidth={SLIDER_WIDTH}
+        itemWidth={ITEM_WIDTH}
+        useScrollView
+        renderItem={({ item, index }) => (
+          <Box
+            flex={1}
+            key={index}
+          >
+            <Image
+              src={`${api.defaults.baseURL}/images/${item.path}`}
+              alt="Imagens do produto"
+              w="full"
+              h="full"
+              resizeMode="stretch"
+            />
+          </Box>
+        )}
+        /> 
 
       <Box
         px="24px"
         mt="22px"
-        flex={1}
+        h="431px"
       >
         <HStack mb="24px">
           <Pressable
@@ -57,7 +133,17 @@ export function DetailsMyAds() {
             justifyContent="center"
             alignItems="center"
           >
+            { user.avatar ?
+            <Image 
+              h="full"
+              w="full"
+              rounded="full" 
+              alt="Foto do perfil"
+              src={`${api.defaults.baseURL}/images/${user.avatar}`}
+            />
+            :
             <User size={20} color="#647AC7" />
+            }
           </Pressable>
 
           <Text 
@@ -66,7 +152,7 @@ export function DetailsMyAds() {
             fontSize="sm"
             ml="8px"
           >
-            Maria Gomes
+            { user.name }
           </Text>
         </HStack>
 
@@ -84,7 +170,7 @@ export function DetailsMyAds() {
             fontSize="10px"
             textTransform="uppercase"
           >
-            Usado
+           { currentProduct.is_new ? "Novo" : "Usado"}
           </Text>
         </Center>
 
@@ -98,7 +184,7 @@ export function DetailsMyAds() {
             fontFamily="heading"
             fontSize="lg"
           >
-            Luminária pendente
+           { currentProduct.name }
           </Text>
 
           <Text
@@ -111,7 +197,7 @@ export function DetailsMyAds() {
               fontFamily="heading"
               fontSize="lg"
             >
-              {" 45,00"}
+              { ` ${currentProduct.price?.toFixed(2).toString().replace(".", ",")}` }
             </Text>
           </Text>
         </HStack>
@@ -121,7 +207,7 @@ export function DetailsMyAds() {
           fontFamily="body"
           fontSize="sm"
         >
-          Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. 
+          { currentProduct.description }
         </Text>
 
         <HStack
@@ -141,7 +227,7 @@ export function DetailsMyAds() {
             fontFamily="body"
             fontSize="sm"
           >
-            Não
+           { currentProduct.accept_trade ? "Sim" : "Não"}
           </Text>
         </HStack>
 
@@ -153,20 +239,23 @@ export function DetailsMyAds() {
         >
           Meios de pagamento:
         </Text>
+        
+        { isLoading ?
+        <Loading />
+        :
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <IconOptionsOfPayment 
+            methods={methodsPayment}
+          />
+        </ScrollView> 
 
-        <IconOptionsOfPayment 
-          ticket
-          bankDeposit
-          card={false}
-          money={false}
-          pix
-        />
+        }
 
         <Button
-         // mt="32px"
+          mt="10px"
           h="42px"
           w="full"
-          bg="blue.400"
+          bg={ currentProduct.is_active ? "gray.100" : "blue.400"}
           borderRadius="6px"
           startIcon={
             <Power 
@@ -185,12 +274,12 @@ export function DetailsMyAds() {
           }}
           //onPress={newNavigationCreateAd}
         >
-          Reativar anúncio
+          { currentProduct.is_active ? "Desativar anúncio" : "Reativar anúncio"}
         </Button>
 
         <Button
           mt="8px"
-          mb="30px"
+          mb="15px"
           h="42px"
           w="full"
           bg="gray.500"
