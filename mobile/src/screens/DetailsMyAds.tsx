@@ -16,11 +16,16 @@ import Carousel from "react-native-snap-carousel";
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
-export function DetailsMyAds() {
-  const [ isLoading, setIsLoading] = useState(false);
+type IsActiveProps = {
+  is_active: boolean;
+}
 
-  const [ currentProduct, setCurrentProduct ] = useState<DetailsProductDTO>({} as DetailsProductDTO);
-  const [ methodsPayment, setMethodsPayment] = useState<string[]>([]);
+export function DetailsMyAds() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [currentProduct, setCurrentProduct] = useState<DetailsProductDTO>({} as DetailsProductDTO);
+  const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
+  const [actived, setActived] = useState<IsActiveProps>({ is_active: false });
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -40,23 +45,25 @@ export function DetailsMyAds() {
 
   async function handleMethodsPayment(data: DetailsProductDTO) {
 
-    const { payment_methods } = data;
-    
-    const newMethodsPayment = payment_methods.map(( item, index) => {
+    const { payment_methods, is_active } = data;
+
+    const newMethodsPayment = payment_methods.map((item, index) => {
       return item.key;
     });
+
+    setActived({ is_active });
 
     return newMethodsPayment;
   }
 
   async function handleGetOneProduct() {
     try {
-      
+
       setIsLoading(true);
       const { data } = await api.get(`/products/${id}`);
-     
+
       setCurrentProduct(data);
-     
+
       const allMethodsPayment = await handleMethodsPayment(data);
 
       setMethodsPayment(allMethodsPayment);
@@ -68,18 +75,39 @@ export function DetailsMyAds() {
     }
   }
 
+  async function handleIsActiveOrDeactive(active: IsActiveProps) {
+    try {
+      await api.patch(`/products/${id}`, active);
+
+      setActived({ is_active: !active.is_active });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async function handleRemoveMyAd() {
+    try {
+      setIsLoading(true);
+      await api.delete(`/products/${id}`);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   useFocusEffect(useCallback(() => {
     handleGetOneProduct();
   }, [id]));
 
-  if(isLoading) { 
+  if (isLoading) {
     return <Loading />
   }
 
   return (
     <VStack flex={1} safeArea mt="10px">
       <Box
-        h="24px" 
+        h="24px"
         w="full"
         px="24px"
         mb="12px"
@@ -113,10 +141,30 @@ export function DetailsMyAds() {
               w="full"
               h="full"
               resizeMode="stretch"
+              opacity={0.8}
             />
+
+            {actived.is_active ?
+              <></>
+              :
+              <Center
+                flex={1}
+                position="absolute"
+              >
+                <Text
+                  color="gray.700"
+                  fontFamily="heading"
+                  fontSize="sm"
+                  textTransform="uppercase"
+
+                >
+                  anúncio desativado
+                </Text>
+              </Center>
+            }
           </Box>
         )}
-        /> 
+      />
 
       <Box
         px="24px"
@@ -133,26 +181,26 @@ export function DetailsMyAds() {
             justifyContent="center"
             alignItems="center"
           >
-            { user.avatar ?
-            <Image 
-              h="full"
-              w="full"
-              rounded="full" 
-              alt="Foto do perfil"
-              src={`${api.defaults.baseURL}/images/${user.avatar}`}
-            />
-            :
-            <User size={20} color="#647AC7" />
+            {user.avatar ?
+              <Image
+                h="full"
+                w="full"
+                rounded="full"
+                alt="Foto do perfil"
+                src={`${api.defaults.baseURL}/images/${user.avatar}`}
+              />
+              :
+              <User size={20} color="#647AC7" />
             }
           </Pressable>
 
-          <Text 
-            color="gray.100" 
+          <Text
+            color="gray.100"
             fontFamily="body"
             fontSize="sm"
             ml="8px"
           >
-            { user.name }
+            {user.name}
           </Text>
         </HStack>
 
@@ -165,12 +213,12 @@ export function DetailsMyAds() {
           alignItems="center"
         >
           <Text
-            color="gray.200" 
+            color="gray.200"
             fontFamily="heading"
             fontSize="10px"
             textTransform="uppercase"
           >
-           { currentProduct.is_new ? "Novo" : "Usado"}
+            {currentProduct.is_new ? "Novo" : "Usado"}
           </Text>
         </Center>
 
@@ -180,34 +228,34 @@ export function DetailsMyAds() {
           my="8px"
         >
           <Text
-            color="gray.100" 
+            color="gray.100"
             fontFamily="heading"
             fontSize="lg"
           >
-           { currentProduct.name }
+            {currentProduct.name}
           </Text>
 
           <Text
-            color="blue.400" 
+            color="blue.400"
             fontFamily="heading"
             fontSize="sm"
           > R$
             <Text
-              color="blue.400" 
+              color="blue.400"
               fontFamily="heading"
               fontSize="lg"
             >
-              { ` ${currentProduct.price?.toFixed(2).toString().replace(".", ",")}` }
+              {` ${currentProduct.price?.toFixed(2).toString().replace(".", ",")}`}
             </Text>
           </Text>
         </HStack>
 
         <Text
-          color="gray.200" 
+          color="gray.200"
           fontFamily="body"
           fontSize="sm"
         >
-          { currentProduct.description }
+          {currentProduct.description}
         </Text>
 
         <HStack
@@ -215,7 +263,7 @@ export function DetailsMyAds() {
           mb="16px"
         >
           <Text
-            color="gray.200" 
+            color="gray.200"
             fontFamily="heading"
             fontSize="sm"
           >
@@ -223,31 +271,31 @@ export function DetailsMyAds() {
           </Text>
 
           <Text
-            color="gray.200" 
+            color="gray.200"
             fontFamily="body"
             fontSize="sm"
           >
-           { currentProduct.accept_trade ? "Sim" : "Não"}
+            {currentProduct.accept_trade ? "Sim" : "Não"}
           </Text>
         </HStack>
 
         <Text
-          color="gray.200" 
+          color="gray.200"
           fontFamily="heading"
           fontSize="sm"
           mb="8px"
         >
           Meios de pagamento:
         </Text>
-        
-        { isLoading ?
-        <Loading />
-        :
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <IconOptionsOfPayment 
-            methods={methodsPayment}
-          />
-        </ScrollView> 
+
+        {isLoading ?
+          <Loading />
+          :
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <IconOptionsOfPayment
+              methods={methodsPayment}
+            />
+          </ScrollView>
 
         }
 
@@ -255,13 +303,13 @@ export function DetailsMyAds() {
           mt="10px"
           h="42px"
           w="full"
-          bg={ currentProduct.is_active ? "gray.100" : "blue.400"}
+          bg={actived.is_active ? "gray.100" : "blue.400"}
           borderRadius="6px"
           startIcon={
-            <Power 
-            size={16} 
-            color="#EDECEE"
-            weight="bold"
+            <Power
+              size={16}
+              color="#EDECEE"
+              weight="bold"
             />}
           _pressed={{
             backgroundColor: "blue.200"
@@ -272,9 +320,9 @@ export function DetailsMyAds() {
             color: "gray.700",
             marginLeft: "8px"
           }}
-          //onPress={newNavigationCreateAd}
+          onPress={() => handleIsActiveOrDeactive(actived)}
         >
-          { currentProduct.is_active ? "Desativar anúncio" : "Reativar anúncio"}
+          {actived.is_active ? "Desativar anúncio" : "Reativar anúncio"}
         </Button>
 
         <Button
@@ -285,10 +333,10 @@ export function DetailsMyAds() {
           bg="gray.500"
           borderRadius="6px"
           startIcon={
-            <TrashSimple 
-            size={16} 
-            color="#5F5B62"
-            weight="bold"
+            <TrashSimple
+              size={16}
+              color="#5F5B62"
+              weight="bold"
             />}
           _pressed={{
             backgroundColor: "gray.600"
@@ -299,11 +347,11 @@ export function DetailsMyAds() {
             color: "gray.200",
             marginLeft: "8px"
           }}
-          //onPress={newNavigationCreateAd}
+          onPress={() => { handleRemoveMyAd(), handleNewNavigationMyAds() }}
         >
           Excluir anúncio
         </Button>
-    </Box>
-  </VStack>
+      </Box>
+    </VStack>
   )
 }
