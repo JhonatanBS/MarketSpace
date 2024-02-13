@@ -26,6 +26,7 @@ export function DetailsMyAds() {
   const [currentProduct, setCurrentProduct] = useState<DetailsProductDTO>({} as DetailsProductDTO);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
   const [actived, setActived] = useState<IsActiveProps>({ is_active: false });
+  const [allImages, setAllImages] = useState<string[]>([]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -35,12 +36,22 @@ export function DetailsMyAds() {
 
   const { user } = useAuth();
 
+  console.log(currentProduct.product_images);
+
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds");
   }
 
-  function handleNewNavigationEditMyAd() {
-    //navigation.navigate("editAd");
+  function handleNewNavigationEditMyAd(idEdit: IdDTO) {
+    navigation.navigate("editAd", {
+      product_images: allImages,
+      name: currentProduct.name,
+      description: currentProduct.description,
+      price: currentProduct.price,
+      is_new: currentProduct.is_new,
+      accept_trade: currentProduct.accept_trade,
+      payment_methods: [methodsPayment]
+    });
   }
 
   async function handleMethodsPayment(data: DetailsProductDTO) {
@@ -56,6 +67,17 @@ export function DetailsMyAds() {
     return newMethodsPayment;
   }
 
+  async function handleAllImages(data: DetailsProductDTO) {
+
+    const { product_images } = data;
+
+    const newMethodsPayment = product_images.map((item, index) => {
+      return item.path;
+    });
+
+    return newMethodsPayment;
+  }
+
   async function handleGetOneProduct() {
     try {
 
@@ -65,8 +87,10 @@ export function DetailsMyAds() {
       setCurrentProduct(data);
 
       const allMethodsPayment = await handleMethodsPayment(data);
+      const allImagesAd = await handleAllImages(data);
 
       setMethodsPayment(allMethodsPayment);
+      setAllImages(allImagesAd);
 
     } catch (error) {
       throw error;
@@ -118,7 +142,7 @@ export function DetailsMyAds() {
           <ArrowLeft size={24} color="#1A181B" />
         </Pressable>
 
-        <Pressable onPress={handleNewNavigationEditMyAd}>
+        <Pressable onPress={() => handleNewNavigationEditMyAd({id})}>
           <PencilSimpleLine size={24} color="#1A181B" />
         </Pressable>
       </Box>

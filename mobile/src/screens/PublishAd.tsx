@@ -35,7 +35,7 @@ export function PublicAd() {
     name,
     payment_methods,
     is_new,
-    imageProduct, 
+    product_images, 
     description
   } = params as ProductDTO; 
 
@@ -61,7 +61,7 @@ export function PublicAd() {
 
       const uploadImagesProduct = new FormData();
 
-      const uploadAllFile = imageProduct.map((file, index) => {
+      const uploadAllFile = product_images.map((file, index) => {
         let fileExtension = file.split(".").pop();
 
         let photoFile = {
@@ -129,7 +129,7 @@ export function PublicAd() {
 
       <Carousel
         layout="default"
-        data={imageProduct}
+        data={product_images}
         keyExtractor={(item) => item}
         sliderWidth={SLIDER_WIDTH}
         itemWidth={ITEM_WIDTH}

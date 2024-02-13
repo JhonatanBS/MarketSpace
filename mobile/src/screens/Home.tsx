@@ -28,6 +28,7 @@ export function Home() {
   const [accepetedExchange, setAccepetedExchange] = useState(false);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
 
+  //console.log(newObject, accepetedExchange, methodsPayment)
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
       title: "Boleto",
@@ -68,6 +69,22 @@ export function Home() {
     navigation.navigate("myAds");
   }
 
+  async function handleFilterAds() {
+    try {
+       const { data } = await api.get("/products/", {
+        params: {
+          is_new: newObject,
+          accept_trade: accepetedExchange,
+          payment_methods: methodsPayment
+        }
+       });
+
+       console.log(" Dados => ",data)
+    } catch (error) {
+      throw error;
+    }
+  }
+
   function handleIsCheckInMethodsPayment(title: string) {
     const updateMethodPayment = allMethodsPayment.map((data) => {
       data.title === title ?
@@ -103,7 +120,6 @@ export function Home() {
 
       setAllMyProducts(data);
 
-      console.log("AD => ", allMyProducts);
     } catch (error) {
       throw error;
     } finally {
@@ -460,6 +476,7 @@ export function Home() {
                 _pressed={{
                   backgroundColor: "gray.200"
                 }}
+                onPress={handleFilterAds}
               >
                 Aplicar filtros
               </Button>

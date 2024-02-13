@@ -18,7 +18,6 @@ import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { AppError } from "@utils/AppError";
-import { ProductDTO } from "@dtos/ProductDTO";
 
 type FormDataProps = {
   title: string;
@@ -121,7 +120,7 @@ export function CreateAd() {
       }
 
       navigation.navigate("publishAd", {
-        imageProduct: addImageProduct,
+        product_images: addImageProduct,
         name: title,
         description,
         price: parseFloat(price.replace(",", ".")),
