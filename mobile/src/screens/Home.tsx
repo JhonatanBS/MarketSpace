@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import { Ad, AdProps } from "@components/Ad";
 
@@ -16,8 +16,10 @@ import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 
 type methodsPaymentProps = {
+  id: number,
   title: string;
   isCheck: boolean;
+  type: string;
 }
 
 export function Home() {
@@ -27,35 +29,44 @@ export function Home() {
   const [usedObject, setUsedObject] = useState(false);
   const [accepetedExchange, setAccepetedExchange] = useState(false);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
+  const [findAd, setFindAd] = useState("");
 
-  //console.log(newObject, accepetedExchange, methodsPayment)
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
+      id: 1,
       title: "Boleto",
-      isCheck: false
+      isCheck: false,
+      type: "boleto"
     },
     {
+      id: 2,
       title: "Pix",
-      isCheck: false
+      isCheck: false,
+      type: "pix"
     },
     {
+      id: 3,
       title: "Dinheiro",
-      isCheck: false
+      isCheck: false,
+      type: "cash"
     },
     {
+      id: 4,
       title: "Cartão de Crédito",
-      isCheck: false
+      isCheck: false,
+      type: "card"
     },
     {
+      id: 5,
       title: "Depósito Bancário",
-      isCheck: false
+      isCheck: false,
+      type: "deposit"
     },
   ]);
 
   const [counterProducts, setCounterProducts] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [allMyProducts, setAllMyProducts] = useState<AdProps[]>([]);
-
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -71,23 +82,46 @@ export function Home() {
 
   async function handleFilterAds() {
     try {
-       const { data } = await api.get("/products/", {
+      const { data } = await api.get("/products/", {
         params: {
           is_new: newObject,
           accept_trade: accepetedExchange,
-          payment_methods: methodsPayment
-        }
-       });
+          payment_methods: methodsPayment,
+          query: findAd
+        },
+      });
 
-       console.log(" Dados => ",data)
+      setAllMyProducts(data);
     } catch (error) {
       throw error;
     }
   }
 
+  async function handleClearFIlterAd() {
+    try {
+      setIsLoading(true);
+
+      setNewObject(false);
+      setAccepetedExchange(false);
+      setFindAd("");
+      setMethodsPayment([]);
+      allMethodsPayment.map((item) => item.isCheck = false);
+
+      const { data } = await api.get(`/products`);
+
+      setAllMyProducts(data);
+      setShowModal(false);
+
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function handleIsCheckInMethodsPayment(title: string) {
     const updateMethodPayment = allMethodsPayment.map((data) => {
-      data.title === title ?
+      data.type === title ?
         (data.isCheck = !data.isCheck, data.isCheck ? setMethodsPayment([...methodsPayment, title]) : handleRemoveMethodsPayment(title))
         :
         data.isCheck
@@ -277,6 +311,8 @@ export function Home() {
       </Text>
 
       <Input
+        onChangeText={(text) => setFindAd(text)}
+        value={findAd}
         mb="24px"
         w="full"
         h="45px"
@@ -295,7 +331,7 @@ export function Home() {
         placeholder="Buscar anúncio"
         InputRightElement={
           <Box flexDirection="row" pr="16px">
-            <Pressable onPress={() => console.log("Ola mundo")}>
+            <Pressable onPress={() => handleFilterAds()}>
               <MagnifyingGlass size={20} color="#3E3A40" />
             </Pressable>
 
@@ -321,18 +357,18 @@ export function Home() {
           justifyContent="space-between"
         >
           {allMyProducts.map((product, index) => (
-              <Ad
-                name={product.name}
-                price={product.price}
-                is_new={product.is_new}
-                product_images={product.product_images}
-                user_id={product.user_id}
-                id={product.id}
-                user={product.user}
-                key={index}
-              />
-            ))
-            }
+            <Ad
+              name={product.name}
+              price={product.price}
+              is_new={product.is_new}
+              product_images={product.product_images}
+              user_id={product.user_id}
+              id={product.id}
+              user={product.user}
+              key={index}
+            />
+          ))
+          }
         </Box>
       </ScrollView>
 
@@ -436,7 +472,7 @@ export function Home() {
                 title={data.title}
                 type={data.isCheck}
                 key={index}
-                onPress={() => handleIsCheckInMethodsPayment(data.title)}
+                onPress={() => handleIsCheckInMethodsPayment(data.type)}
               />
             ))}
 
@@ -458,7 +494,7 @@ export function Home() {
                 _pressed={{
                   backgroundColor: "gray.600"
                 }}
-
+                onPress={handleClearFIlterAd}
               >
                 Resetar filtros
               </Button>
@@ -476,7 +512,7 @@ export function Home() {
                 _pressed={{
                   backgroundColor: "gray.200"
                 }}
-                onPress={handleFilterAds}
+                onPress={() => { handleFilterAds(), setShowModal(false) }}
               >
                 Aplicar filtros
               </Button>
