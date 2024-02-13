@@ -36,14 +36,13 @@ export function DetailsMyAds() {
 
   const { user } = useAuth();
 
-  console.log(currentProduct.product_images);
-
   function handleNewNavigationMyAds() {
     navigation.navigate("myAds");
   }
 
   function handleNewNavigationEditMyAd(idEdit: IdDTO) {
     navigation.navigate("editAd", {
+      id,
       product_images: allImages,
       name: currentProduct.name,
       description: currentProduct.description,

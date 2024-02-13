@@ -1,4 +1,5 @@
 export type ProductDTO = {
+  id: string;
   product_images: string[];
   name: string;
   description: string;

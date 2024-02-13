@@ -1,4 +1,4 @@
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,7 +12,7 @@ import { ArrowLeft, Plus, XCircle } from "phosphor-react-native";
 
 import { Box, Pressable, VStack, Text, ScrollView, Button, Image, useToast } from "native-base";
 import { InputForm } from "@components/InputForm";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { TypeProduct } from "@components/TypeProduct";
 import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
@@ -41,10 +41,24 @@ const signInSchema = yup.object({
 });
 
 export function EditAd() {
-  const [addImageProduct, setAddImageProduct] = useState<string[]>([]);
-  const [newProduct, setNewProduct] = useState<boolean>(false);
-  const [accepetedExchange, setAccepetedExchange] = useState(false);
-  const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
+
+  const { params } = useRoute();
+
+  const { 
+    id,
+    accept_trade, 
+    price, 
+    name, 
+    payment_methods, 
+    is_new, 
+    product_images, 
+    description 
+  } = params as ProductDTO;
+
+  const [addImageProduct, setAddImageProduct] = useState<string[]>(product_images);
+  const [newProduct, setNewProduct] = useState<boolean>(is_new);
+  const [accepetedExchange, setAccepetedExchange] = useState(accept_trade);
+  const [methodsPayment, setMethodsPayment] = useState<string[]>(payment_methods[0]);
 
   const [allMethodsPayment, setAllMethodsPayment] = useState<methodsPaymentProps[]>([
     {
@@ -81,26 +95,6 @@ export function EditAd() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const { params } = useRoute();
-
-  const { 
-    accept_trade, 
-    price, 
-    name, 
-    payment_methods, 
-    is_new, 
-    product_images, 
-    description 
-  } = params as ProductDTO;
-
-  console.log(accept_trade, 
-    price, 
-    name, 
-    payment_methods, 
-    is_new, 
-    product_images, 
-    description )
-
   const toast = useToast();
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
@@ -111,25 +105,33 @@ export function EditAd() {
     navigation.goBack();
   }
 
-  function handleNewNavigationPublishAd({ title, description, price}: FormDataProps) {
-    try {
+  async function handleNewNavigationAndUpdateAd({ title, description, price}: FormDataProps) {
 
-      if(addImageProduct.length === 0 || methodsPayment .length === 0) {
+    try {
+      /*console.log(title, description, price)
+      if(product_images.length === 0 || methodsPayment .length === 0) {
         return toast.show({
           title: "As imagens e os meios de pagamento são obrigatórios!",
           placement: "top",
           bgColor: "red.400"
         });
-      }
-
-      navigation.navigate("publishAd", {
-        product_images: addImageProduct,
+      }*/
+      
+      await api.put(`/products/${id}`,{
         name: title,
-        description,
-        price: parseFloat(price.replace(",", ".")),
+        description: description,
         is_new: newProduct,
+        price: parseInt(price),
         accept_trade: accepetedExchange,
-        payment_methods: [methodsPayment]
+        payment_methods: methodsPayment
+      });
+
+      navigation.navigate("detailsMyAds", {id});
+
+      toast.show({
+        title: "Anúncio atualizado com sucesso",
+        placement: "top",
+        bgColor: "green.500"
       });
 
     } catch (error) {
@@ -199,6 +201,20 @@ export function EditAd() {
     const removeMethodPayment = methodsPayment.filter((titleMethod) => titleMethod !== method);
     setMethodsPayment(removeMethodPayment);
   }
+
+  function handleShowAllMethodsPayment() {
+    const showAllMethodsPayment = allMethodsPayment.map((item) => {
+      methodsPayment.includes(item.type) ? item.isCheck = true : item.isCheck
+      return item;
+    });
+
+    setAllMethodsPayment(showAllMethodsPayment);
+  }
+
+  useFocusEffect(useCallback(() => {
+    handleShowAllMethodsPayment();
+  },[]));
+
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} mt="45px">
@@ -373,7 +389,7 @@ export function EditAd() {
           </Text>
 
           <TypeProduct
-            type={!is_new}
+            type={!newProduct}
             onPress={() => { setNewProduct(false) }}
           />
           <Text
@@ -496,7 +512,7 @@ export function EditAd() {
           _pressed={{
             backgroundColor: "gray.200"
           }}
-          onPress={handleSubmit(handleNewNavigationPublishAd)}
+          onPress={handleSubmit(handleNewNavigationAndUpdateAd)}
         >
           Avançar
         </Button>

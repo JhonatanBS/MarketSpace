@@ -32,7 +32,6 @@ export function MyAds() {
   }
 
   function handleNewNavigationDetailsMyAds(id: string) {
-    console.log(id)
     navigation.navigate("detailsMyAds", { id });
   }
 
