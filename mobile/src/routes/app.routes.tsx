@@ -17,6 +17,7 @@ import { useAuth } from "@hooks/useAuth";
 import { Logout } from "@screens/Logout";
 import { ProductDTO } from "@dtos/ProductDTO";
 import { IdDTO } from "@dtos/IdDTO";
+import { ShowOneAdUser } from "@screens/ShowOneAdUser";
 
 type AuthRoutesProps = {
   home: undefined;
@@ -26,6 +27,7 @@ type AuthRoutesProps = {
   editAd: ProductDTO;
   detailsMyAds: IdDTO;
   publishAd: ProductDTO;
+  showOneAdUser: IdDTO;
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AuthRoutesProps>;
@@ -111,6 +113,15 @@ export function AppRoutes() {
       <Screen 
         name="detailsMyAds"
         component={DetailsMyAds}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none"}
+        }}
+      />
+
+<Screen 
+        name="showOneAdUser"
+        component={ShowOneAdUser}
         options={{
           tabBarButton: () => null,
           tabBarStyle: { display: "none"}

@@ -14,6 +14,7 @@ import { CheckBoxPayment } from "@components/CheckBoxPayment";
 import { SwitchExchange } from "@components/SwitchExchange";
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
+import { IdDTO } from "@dtos/IdDTO";
 
 type methodsPaymentProps = {
   id: number,
@@ -78,6 +79,10 @@ export function Home() {
 
   function newNavigationMyAds() {
     navigation.navigate("myAds");
+  }
+
+  function newNavigationShowOneAdUser(id: string) {
+    navigation.navigate("showOneAdUser", {id});
   }
 
   async function handleFilterAds() {
@@ -366,6 +371,7 @@ export function Home() {
               id={product.id}
               user={product.user}
               key={index}
+              onPress={() => newNavigationShowOneAdUser(product.id)}
             />
           ))
           }
