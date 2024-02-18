@@ -10,6 +10,7 @@ export type AdProps = IPressableProps & {
   is_new: boolean;
   user_id?: string;
   user?: AvatarProps;
+  is_active?: boolean;
 }
 
 type ProductImageProps = {

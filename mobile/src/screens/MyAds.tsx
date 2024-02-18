@@ -9,12 +9,9 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { Ad, AdProps } from "@components/Ad";
 import { Loading } from "@components/Loading";
 
-import { useAuth } from "@hooks/useAuth";
-
 import { api } from "@services/api";
 
 import { CaretDown, CaretUp, Plus } from "phosphor-react-native";
-import { ProductDTO } from "@dtos/ProductDTO";
 
 export function MyAds() {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,9 +20,9 @@ export function MyAds() {
 
   const [allMyProducts, setAllMyProducts] = useState<AdProps[]>([]);
 
-  const { user } = useAuth();
-
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  console.log(chooseFilter)
 
   function handleNewNavigationCreateAd() {
     navigation.navigate("createAd");
@@ -33,6 +30,67 @@ export function MyAds() {
 
   function handleNewNavigationDetailsMyAds(id: string) {
     navigation.navigate("detailsMyAds", { id });
+  }
+
+  async function filterAdActive(data: AdProps[]): Promise<AdProps[]> {
+    const adsActive = data.filter((item) => item.is_active === true);
+
+    return adsActive;
+  }
+
+  async function filterAdDeactivate(data: AdProps[]): Promise<AdProps[]> {
+    const adsDeactivate = data.filter((item) => item.is_active === false);
+
+    return adsDeactivate;
+  }
+
+  async function handleShowAdActive() {
+    try {
+      setIsLoading(true);
+      setChooseFilter("Ativos");
+      setButtonFilter(false);
+
+      const { data } = await api.get(`/users/products`); 
+
+      if(!data) {
+        return;
+      }
+
+      setAllMyProducts(data);
+  
+      const adsActive = await filterAdActive(data);
+
+      setAllMyProducts(adsActive);
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleShowAdDeactivate() {
+    try {
+      setIsLoading(true);
+      setChooseFilter("Inativos");
+      setButtonFilter(false);
+
+      const { data } = await api.get(`/users/products`);
+
+      if(!data) {
+        return;
+      }
+
+      setAllMyProducts(data);
+      
+      const adsDeactivate = await filterAdDeactivate(data);
+      
+      setAllMyProducts(adsDeactivate); 
+
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function handleGetAllMyProducts() {
@@ -45,7 +103,7 @@ export function MyAds() {
       }
 
       setAllMyProducts(data);
-
+     
     } catch (error) {
       throw error;
     } finally {
@@ -54,8 +112,16 @@ export function MyAds() {
   }
 
   useFocusEffect(useCallback(() => {
-    handleGetAllMyProducts();
-  }, []));
+    if(chooseFilter === "Ativos") {
+     console.log("=> ativado")
+     handleShowAdActive();
+    } else if(chooseFilter === "Inativos") {
+     console.log("=> Desativado")
+     handleShowAdDeactivate();
+    } else if(chooseFilter === "Todos"){
+      handleGetAllMyProducts();
+    }
+  }, [chooseFilter]));
 
   return (
     <Box
@@ -157,7 +223,7 @@ export function MyAds() {
 
               <Pressable
                 my="10px"
-                onPress={() => { setChooseFilter("Ativos"), setButtonFilter(!buttonFilter) }}
+                onPress={handleShowAdActive}
               >
                 <Text
                   fontFamily="body"
@@ -169,7 +235,7 @@ export function MyAds() {
               </Pressable>
 
               <Pressable
-                onPress={() => { setChooseFilter("Inativos"), setButtonFilter(!buttonFilter) }}
+                onPress={handleShowAdDeactivate}
               >
                 <Text
                   fontFamily="body"

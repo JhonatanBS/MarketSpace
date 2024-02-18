@@ -205,7 +205,7 @@ export function ShowOneAdUser() {
             justifyContent="center"
             alignItems="center"
           >
-            {currentProduct.user.avatar ?
+            {currentProduct.user?.avatar ?
               <Image
                 h="full"
                 w="full"
@@ -224,7 +224,7 @@ export function ShowOneAdUser() {
             fontSize="sm"
             ml="8px"
           >
-            {currentProduct.user.name}
+            {currentProduct.user?.name}
           </Text>
         </HStack>
 
