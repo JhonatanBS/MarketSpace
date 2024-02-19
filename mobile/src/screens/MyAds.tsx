@@ -22,8 +22,6 @@ export function MyAds() {
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  console.log(chooseFilter)
-
   function handleNewNavigationCreateAd() {
     navigation.navigate("createAd");
   }
@@ -272,6 +270,7 @@ export function MyAds() {
                 is_new={product.is_new}
                 product_images={product.product_images}
                 user_id={product.user_id}
+                is_active={product.is_active}
                 key={index}
                 id={product.id}
                 onPress={() => handleNewNavigationDetailsMyAds(product.id)}

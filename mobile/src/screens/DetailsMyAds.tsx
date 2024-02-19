@@ -16,16 +16,12 @@ import Carousel from "react-native-snap-carousel";
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
-type IsActiveProps = {
-  is_active: boolean;
-}
-
 export function DetailsMyAds() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [currentProduct, setCurrentProduct] = useState<DetailsProductDTO>({} as DetailsProductDTO);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
-  const [actived, setActived] = useState<IsActiveProps>({ is_active: false });
+  const [actived, setActived] = useState<boolean>(true);
   const [allImages, setAllImages] = useState<string[]>([]);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -61,7 +57,8 @@ export function DetailsMyAds() {
       return item.key;
     });
 
-    setActived({ is_active });
+    setActived(is_active);
+    console.log(actived)
 
     return newMethodsPayment;
   }
@@ -98,11 +95,13 @@ export function DetailsMyAds() {
     }
   }
 
-  async function handleIsActiveOrDeactive(active: IsActiveProps) {
-    try {
-      await api.patch(`/products/${id}`, active);
 
-      setActived({ is_active: !active.is_active });
+
+  async function handleIsActiveOrDeactive() {
+    try {
+      const response = await api.patch(`/products/${id}`, { is_active: !actived});
+      setActived(!actived);
+
     } catch (error) {
       throw error;
     }
@@ -167,7 +166,7 @@ export function DetailsMyAds() {
               opacity={0.8}
             />
 
-            {actived.is_active ?
+            {actived ?
               <></>
               :
               <Center
@@ -326,7 +325,7 @@ export function DetailsMyAds() {
           mt="10px"
           h="42px"
           w="full"
-          bg={actived.is_active ? "gray.100" : "blue.400"}
+          bg={actived? "gray.100" : "blue.400"}
           borderRadius="6px"
           startIcon={
             <Power
@@ -343,9 +342,9 @@ export function DetailsMyAds() {
             color: "gray.700",
             marginLeft: "8px"
           }}
-          onPress={() => handleIsActiveOrDeactive(actived)}
+          onPress={handleIsActiveOrDeactive}
         >
-          {actived.is_active ? "Desativar anúncio" : "Reativar anúncio"}
+          {actived ? "Desativar anúncio" : "Reativar anúncio"}
         </Button>
 
         <Button

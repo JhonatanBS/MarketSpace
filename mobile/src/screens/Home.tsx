@@ -368,6 +368,7 @@ export function Home() {
               is_new={product.is_new}
               product_images={product.product_images}
               user_id={product.user_id}
+              is_active
               id={product.id}
               user={product.user}
               key={index}

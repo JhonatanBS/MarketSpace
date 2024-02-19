@@ -1,6 +1,7 @@
 import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 import { Box, Text, Image, Pressable, IPressableProps } from "native-base";
+import { Loading } from "./Loading";
 
 export type AdProps = IPressableProps & {
   id: string;
@@ -22,7 +23,7 @@ type AvatarProps = {
   avatar: string;
 }
 
-export function Ad({ name, price, product_images, is_new, user_id, user, ...rest }: AdProps) {
+export function Ad({ name, price, product_images, is_new, user_id, user, is_active, ...rest }: AdProps) {
 
   const { id } = useAuth().user;
 
@@ -43,12 +44,32 @@ export function Ad({ name, price, product_images, is_new, user_id, user, ...rest
           h="full"
           width="full"
           borderRadius={6}
+          opacity={ is_active ? 1 : 0.7 }
           resizeMode="contain"
           alt="Foto do anúncio"
           source={{ uri: `${api.defaults.baseURL}/images/${product_images[0].path}` }}
         />
 
-        { id === user_id ?
+        {is_active
+          ?
+          <></>
+          :
+
+          <Text
+            fontFamily="heading"
+            color="gray.700"
+            fontSize="11px"
+            textTransform="uppercase"
+            position="absolute"
+            bottom="8px"
+            left="8px"
+          >
+            anúncio desativado
+          </Text>
+        }
+
+
+        {id === user_id ?
           <></>
           :
           <Box
@@ -83,6 +104,7 @@ export function Ad({ name, price, product_images, is_new, user_id, user, ...rest
             justifyContent="center"
             alignItems="center"
             borderRadius={50}
+            opacity={ is_active ? 1 : 0.7 }
           >
             <Text
               fontFamily="heading"
@@ -105,6 +127,7 @@ export function Ad({ name, price, product_images, is_new, user_id, user, ...rest
             justifyContent="center"
             alignItems="center"
             borderRadius={50}
+            opacity={ is_active ? 1 : 0.7}
           >
             <Text
               fontFamily="heading"
@@ -124,7 +147,7 @@ export function Ad({ name, price, product_images, is_new, user_id, user, ...rest
         mb="2px"
         fontFamily="body"
         fontSize="sm"
-        color="gray.200"
+        color={is_active ? "gray.200" : "gray.400"}
       >
         {name}
       </Text>
@@ -132,13 +155,13 @@ export function Ad({ name, price, product_images, is_new, user_id, user, ...rest
       <Text
         fontFamily="heading"
         fontSize="xs"
-        color="gray.100"
+        color={is_active ? "gray.200" : "gray.400"}
       >
         R$
         <Text
           fontFamily="heading"
           fontSize="sm"
-          color="gray.100"
+          color={is_active ? "gray.200" : "gray.400"}
         >
           {` ${price}`}
         </Text>
