@@ -1,4 +1,4 @@
-import { Box, VStack, Text, HStack } from "native-base";
+    import { Box, VStack, Text, HStack } from "native-base";
 import { Bank, Barcode, CreditCard, Money, QrCode } from "phosphor-react-native";
 
 type MethodsPaymentProps = {
@@ -7,7 +7,7 @@ type MethodsPaymentProps = {
 
 export function IconOptionsOfPayment({ methods }: MethodsPaymentProps) {
   return(
-    <VStack flex={1}>
+    <VStack flex={1} mb="130px">
 
       { methods.includes("boleto") ? 
         <HStack

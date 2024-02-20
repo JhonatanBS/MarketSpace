@@ -17,10 +17,12 @@ import { ArrowLeft, Tag, User } from "phosphor-react-native";
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
-import Carousel from 'react-native-snap-carousel';
+import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { AppError } from "@utils/AppError";
+import { useState } from "react";
 
 export function PublicAd() {
+  const [dotCurrent, setDotCurrent] = useState(0);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
@@ -35,9 +37,9 @@ export function PublicAd() {
     name,
     payment_methods,
     is_new,
-    product_images, 
+    product_images,
     description
-  } = params as ProductDTO; 
+  } = params as ProductDTO;
 
   function handleNewNavigationMyAds() {
     navigation.navigate("home");
@@ -50,7 +52,7 @@ export function PublicAd() {
   async function createAd() {
     try {
 
-     const { data } = await api.post("/products", {
+      const { data } = await api.post("/products", {
         name,
         description,
         is_new,
@@ -79,21 +81,21 @@ export function PublicAd() {
 
       await api.post("/products/images", uploadImagesProduct, {
         headers: {
-          "Content-Type": "multipart/form-data" 
+          "Content-Type": "multipart/form-data"
         }
       });
 
       toast.show({
-      title: "Produto cadastrado com sucesso",
-      placement: "top",
-      bgColor: "green.500"
+        title: "Produto cadastrado com sucesso",
+        placement: "top",
+        bgColor: "green.500"
       });
 
     } catch (error) {
       const isAppError = error instanceof AppError;
 
       const title = isAppError ? error.message : "Não foi possível avançar. Tente novamente mais tarde";
-    
+
       toast.show({
         title,
         placement: "top",
@@ -127,28 +129,58 @@ export function PublicAd() {
         </Text>
       </Center>
 
-      <Carousel
-        layout="default"
-        data={product_images}
-        keyExtractor={(item) => item}
-        sliderWidth={SLIDER_WIDTH}
-        itemWidth={ITEM_WIDTH}
-        useScrollView
-        renderItem={({ item, index }) => (
-          <Box
-            flex={1}
-            key={index}
-          >
-            <Image
-              source={{ uri: item }}
-              alt="Imagens do produto"
-              w="full"
-              h="full"
-              resizeMode="cover"
-            />
-          </Box>
-        )}
-      />
+      <Box
+        h="280px"
+        w="full"
+      >
+        <Carousel
+          layout="default"
+          data={product_images}
+          keyExtractor={(item) => item}
+          sliderWidth={SLIDER_WIDTH}
+          itemWidth={ITEM_WIDTH}
+          useScrollView
+          onSnapToItem={(index) => setDotCurrent(index)}
+          renderItem={({ item, index }) => (
+            <Box
+              flex={1}
+              key={index}
+            >
+              <Image
+                source={{ uri: item }}
+                alt="Imagens do produto"
+                w="full"
+                h="full"
+                resizeMode="cover"
+              />
+            </Box>
+          )}
+        />
+
+        <Pagination
+          dotsLength={product_images?.length}
+          activeDotIndex={dotCurrent}
+          containerStyle={
+            {
+              backgroundColor: "transparent",
+              position: "absolute",
+              bottom: -20,
+              left: SLIDER_WIDTH * 0.30,
+              justifyContent: "center",
+              alignItems: "center"
+            }
+          }
+          dotStyle={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            marginHorizontal: 8,
+            backgroundColor: "#000000"
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </Box>
 
       <Box
         px="24px"
@@ -274,11 +306,10 @@ export function PublicAd() {
           Meios de pagamento:
         </Text>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
           <IconOptionsOfPayment
             methods={payment_methods[0]}
           />
-        </ScrollView>
+        
       </Box>
 
       <Box
@@ -335,7 +366,7 @@ export function PublicAd() {
             color: "gray.700",
             marginLeft: "8px"
           }}
-          onPress={() => {handleNewNavigationMyAds(), createAd()}}
+          onPress={() => { handleNewNavigationMyAds(), createAd() }}
         >
           Publicar
         </Button>

@@ -11,13 +11,14 @@ import { Box, HStack, VStack, Pressable, Image, Text, Center, Button, ScrollView
 import { ArrowLeft, PencilSimpleLine, Power, TrashSimple, User } from "phosphor-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { Dimensions } from "react-native";
-import Carousel from "react-native-snap-carousel";
+import Carousel, { Pagination } from "react-native-snap-carousel";
 
 const SLIDER_WIDTH = Dimensions.get("window").width;
 const ITEM_WIDTH = SLIDER_WIDTH;
 
 export function DetailsMyAds() {
   const [isLoading, setIsLoading] = useState(false);
+  const [dotCurrent, setDotCurrent] = useState(0);
 
   const [currentProduct, setCurrentProduct] = useState<DetailsProductDTO>({} as DetailsProductDTO);
   const [methodsPayment, setMethodsPayment] = useState<string[]>([]);
@@ -95,11 +96,9 @@ export function DetailsMyAds() {
     }
   }
 
-
-
   async function handleIsActiveOrDeactive() {
     try {
-      const response = await api.patch(`/products/${id}`, { is_active: !actived});
+      const response = await api.patch(`/products/${id}`, { is_active: !actived });
       setActived(!actived);
 
     } catch (error) {
@@ -140,54 +139,85 @@ export function DetailsMyAds() {
           <ArrowLeft size={24} color="#1A181B" />
         </Pressable>
 
-        <Pressable onPress={() => handleNewNavigationEditMyAd({id})}>
+        <Pressable onPress={() => handleNewNavigationEditMyAd({ id })}>
           <PencilSimpleLine size={24} color="#1A181B" />
         </Pressable>
       </Box>
 
-      <Carousel
-        layout="default"
-        data={currentProduct.product_images}
-        keyExtractor={(item) => item.id}
-        sliderWidth={SLIDER_WIDTH}
-        itemWidth={ITEM_WIDTH}
-        useScrollView
-        renderItem={({ item, index }) => (
-          <Box
-            flex={1}
-            key={index}
-          >
-            <Image
-              src={`${api.defaults.baseURL}/images/${item.path}`}
-              alt="Imagens do produto"
-              w="full"
-              h="full"
-              resizeMode="stretch"
-              opacity={0.8}
-            />
+      <Box
+        h="280px"
+        w="full"
+      >
 
-            {actived ?
-              <></>
-              :
-              <Center
-                flex={1}
-                position="absolute"
-              >
-                <Text
-                  color="gray.700"
-                  fontFamily="heading"
-                  fontSize="sm"
-                  textTransform="uppercase"
+        <Carousel
+          layout="default"
+          data={currentProduct.product_images}
+          keyExtractor={(item) => item.id}
+          sliderWidth={SLIDER_WIDTH}
+          itemWidth={ITEM_WIDTH}
+          useScrollView
+          onSnapToItem={(index) => setDotCurrent(index)}
+          renderItem={({ item, index }) => (
+            <Box
+              flex={1}
+              key={index}
+            >
+              <Image
+                src={`${api.defaults.baseURL}/images/${item.path}`}
+                alt="Imagens do produto"
+                w="full"
+                h="full"
+                resizeMode="stretch"
+                opacity={actived ? 1 : 0.7}
+              />
 
+              {actived ?
+                <></>
+                :
+                <Center
+                  position="absolute"
+                  top={SLIDER_WIDTH * 0.35}
+                  left={SLIDER_WIDTH * 0.35}
                 >
-                  anúncio desativado
-                </Text>
-              </Center>
-            }
-          </Box>
-        )}
-      />
+                  <Text
+                    color="gray.700"
+                    fontFamily="heading"
+                    fontSize="sm"
+                    textTransform="uppercase"
 
+                  >
+                    anúncio desativado
+                  </Text>
+                </Center>
+              }
+            </Box>
+          )}
+        />
+
+        <Pagination
+          dotsLength={currentProduct.product_images?.length}
+          activeDotIndex={dotCurrent}
+          containerStyle={
+            {
+              backgroundColor: "transparent",
+              position: "absolute",
+              bottom: -20,
+              left: SLIDER_WIDTH * 0.30,
+              justifyContent: "center",
+              alignItems: "center"
+            }
+          }
+          dotStyle={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            marginHorizontal: 8,
+            backgroundColor: "#000000"
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </Box>
       <Box
         px="24px"
         mt="22px"
@@ -313,11 +343,11 @@ export function DetailsMyAds() {
         {isLoading ?
           <Loading />
           :
-          <ScrollView showsVerticalScrollIndicator={false}>
+          
             <IconOptionsOfPayment
               methods={methodsPayment}
             />
-          </ScrollView>
+          
 
         }
 
@@ -325,7 +355,7 @@ export function DetailsMyAds() {
           mt="10px"
           h="42px"
           w="full"
-          bg={actived? "gray.100" : "blue.400"}
+          bg={actived ? "gray.100" : "blue.400"}
           borderRadius="6px"
           startIcon={
             <Power
@@ -349,7 +379,7 @@ export function DetailsMyAds() {
 
         <Button
           mt="8px"
-          mb="15px"
+         // mb="15px"
           h="42px"
           w="full"
           bg="gray.500"
