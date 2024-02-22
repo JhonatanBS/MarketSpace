@@ -28,31 +28,14 @@ export function ShowOneAdUser() {
   const [actived, setActived] = useState<IsActiveProps>({ is_active: false });
   const [allImages, setAllImages] = useState<string[]>([]);
 
-
-
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   const { params } = useRoute();
 
   const { id } = params as IdDTO;
 
-  const { user } = useAuth();
-
   function handleNewNavigationHome() {
     navigation.navigate("home");
-  }
-
-  function handleNewNavigationEditMyAd(idEdit: IdDTO) {
-    navigation.navigate("editAd", {
-      id,
-      product_images: allImages,
-      name: currentProduct.name,
-      description: currentProduct.description,
-      price: currentProduct.price,
-      is_new: currentProduct.is_new,
-      accept_trade: currentProduct.accept_trade,
-      payment_methods: [methodsPayment]
-    });
   }
 
   async function handleMethodsPayment(data: DetailsProductDTO) {
@@ -87,35 +70,12 @@ export function ShowOneAdUser() {
 
       setCurrentProduct(data);
 
-      console.log(data)
-
       const allMethodsPayment = await handleMethodsPayment(data);
       const allImagesAd = await handleAllImages(data);
 
       setMethodsPayment(allMethodsPayment);
       setAllImages(allImagesAd);
 
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleIsActiveOrDeactive(active: IsActiveProps) {
-    try {
-      await api.patch(`/products/${id}`, active);
-
-      setActived({ is_active: !active.is_active });
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async function handleRemoveMyAd() {
-    try {
-      setIsLoading(true);
-      await api.delete(`/products/${id}`);
     } catch (error) {
       throw error;
     } finally {
@@ -165,7 +125,6 @@ export function ShowOneAdUser() {
               w="full"
               h="full"
               resizeMode="stretch"
-              opacity={0.8}
             />
 
             {actived.is_active ?

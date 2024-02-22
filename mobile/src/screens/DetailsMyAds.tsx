@@ -59,8 +59,7 @@ export function DetailsMyAds() {
     });
 
     setActived(is_active);
-    console.log(actived)
-
+   
     return newMethodsPayment;
   }
 

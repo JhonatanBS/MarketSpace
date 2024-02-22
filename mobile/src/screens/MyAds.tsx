@@ -111,10 +111,8 @@ export function MyAds() {
 
   useFocusEffect(useCallback(() => {
     if(chooseFilter === "Ativos") {
-     console.log("=> ativado")
      handleShowAdActive();
     } else if(chooseFilter === "Inativos") {
-     console.log("=> Desativado")
      handleShowAdDeactivate();
     } else if(chooseFilter === "Todos"){
       handleGetAllMyProducts();
