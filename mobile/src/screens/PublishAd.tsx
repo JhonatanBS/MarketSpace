@@ -263,7 +263,7 @@ export function PublicAd() {
               fontFamily="heading"
               fontSize="lg"
             >
-              {price.toFixed(2)}
+              {price.toFixed(2).toString().replace(".", ",")}
             </Text>
           </Text>
         </HStack>
